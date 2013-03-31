@@ -5,6 +5,9 @@ from http.server import SimpleHTTPRequestHandler
 import re
 import urllib.parse
 import json
+from yapsy.PluginManager import PluginManagerSingleton
+from yapsy.PluginFileLocator import (PluginFileLocator,
+                                     PluginFileAnalyzerWithInfoFile)
 
 
 class AweRemHTTPHandler(SimpleHTTPRequestHandler):
@@ -13,26 +16,33 @@ class AweRemHTTPHandler(SimpleHTTPRequestHandler):
     unknownModule = 1 << 1
     moduleError = 1 << 2
     moduleregex = re.compile(r"module/([a-z]+)")
-    registered_modules = []
+
+    def __init__(self, *args, **kwargs):
+        pluginLocator = PluginFileLocator()
+        pluginLocator.setPluginPlaces(["modules"])
+        pluginLocator.appendAnalyzer(
+            PluginFileAnalyzerWithInfoFile("AweRemModules", extensions="arm"))
+        self.pm = PluginManagerSingleton.get()
+        self.pm.setPluginLocator(pluginLocator)
+
+        SimpleHTTPRequestHandler.__init__(self, *args, **kwargs)
 
     def do_GET(self):
-        module = self.getModuleNameFromPath(self.path)
-        if(module in self.registered_modules):
-            unused_path, str_args = self.path.split("?", 1)
-            args = urllib.parse.parse_qs(str_args)
-            self.callModule(module, args)
-        else:
-            error = json.dumps({"error": "unknownModule", "data": module})
-            self.sendError(AweRemHTTPHandler.unknownModule, error)
+        modulename = self.getModuleNameFromPath(self.path)
+        args = urllib.parse.parse_qs(self.path)
+        self.callModule(modulename, args)
 
     def callModule(self, module, args):
         try:
-            status, response = self.modulesCallbacks[module](args)
+            plugin = self.pm.getPluginByName(module)
+            if plugin is None:
+                raise Exception("Plugin " + module + " not found")
+            message = plugin.plugin_object.do(args)
         except Exception as e:
-            error = json.dumps({"error": e.getMessage()})
+            error = json.dumps({"error": str(e)})
             self.sendError(AweRemHTTPHandler.moduleError, error)
         else:
-            pass
+            self.sendSuccess(self, message)
 
     def sendError(self, errorType, jsonMessage):
         if(errorType == AweRemHTTPHandler.unknownModule):
