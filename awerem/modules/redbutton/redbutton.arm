@@ -1,0 +1,9 @@
+[Core]
+
+Name = redbutton
+Module = redbutton
+
+[Documentation]
+Author = Paul Ecoffet
+Version = 0.2
+Description = print "Red Button pressed" in the terminal when triggered

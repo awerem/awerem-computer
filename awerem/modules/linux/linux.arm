@@ -1,0 +1,9 @@
+[Core]
+
+Name = linux
+Module = linux
+
+[Documentation]
+Author = Paul Ecoffet
+Version = 0.2
+Description = Linux related controls
