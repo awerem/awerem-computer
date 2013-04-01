@@ -8,6 +8,7 @@ import json
 from yapsy.PluginManager import PluginManagerSingleton
 from yapsy.PluginFileLocator import (PluginFileLocator,
                                      PluginFileAnalyzerWithInfoFile)
+from modules.aweremplugin import AweRemPlugin
 
 
 class AweRemHTTPHandler(SimpleHTTPRequestHandler):
@@ -24,6 +25,9 @@ class AweRemHTTPHandler(SimpleHTTPRequestHandler):
             PluginFileAnalyzerWithInfoFile("AweRemModules", extensions="arm"))
         self.pm = PluginManagerSingleton.get()
         self.pm.setPluginLocator(pluginLocator)
+        self.pm.setCategoriesFilter({"Default": AweRemPlugin})
+        self.pm.collectPlugins()
+        self.pm.activatePluginByName("redbutton")
 
         SimpleHTTPRequestHandler.__init__(self, *args, **kwargs)
 
@@ -42,16 +46,21 @@ class AweRemHTTPHandler(SimpleHTTPRequestHandler):
             error = json.dumps({"error": str(e)})
             self.sendError(AweRemHTTPHandler.moduleError, error)
         else:
-            self.sendSuccess(self, message)
+            self.sendSuccess(json.dumps(message))
 
     def sendError(self, errorType, jsonMessage):
         if(errorType == AweRemHTTPHandler.unknownModule):
-            self.send_response(200, "OK")
+            self.send_response(404, "Not Found")
         else:
             self.send_response(500, "Internal Server Error")
         self.send_header("Content-type", "application/json; charset=utf-8")
         self.end_headers()
-        print(jsonMessage)
+        self.wfile.write(jsonMessage.encode('utf-8'))
+
+    def sendSuccess(self, jsonMessage):
+        self.send_response(200, "OK")
+        self.send_header("Content-type", "application/json; charset=utf-8")
+        self.end_headers()
         self.wfile.write(jsonMessage.encode('utf-8'))
 
     @staticmethod
