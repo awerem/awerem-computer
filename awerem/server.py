@@ -27,7 +27,8 @@ class AweRemHTTPHandler(SimpleHTTPRequestHandler):
         self.pm.setPluginLocator(pluginLocator)
         self.pm.setCategoriesFilter({"Default": AweRemPlugin})
         self.pm.collectPlugins()
-        self.pm.activatePluginByName("redbutton")
+        for plugin in self.pm.getAllPlugins():
+            self.pm.activatePluginByName(plugin.name)
 
         SimpleHTTPRequestHandler.__init__(self, *args, **kwargs)
 
