@@ -2,6 +2,7 @@ from modules.aweremplugin import AweRemPlugin
 import re
 import os
 import subprocess
+from modules.moduleErrors import ARModuleError
 
 
 class LinuxRemote(AweRemPlugin):
@@ -11,22 +12,27 @@ class LinuxRemote(AweRemPlugin):
         self.actions = {"shutdown": self.shutdown}
         self.display = os.environ["DISPLAY"]
         self.timeRe = re.compile(
-            r"^((?P<days>\d+)d)?((?P<hours>\d+)h)?((?P<minutes>\d+)m)?$")
+            r"^((?P<days>\d+)day)?((?P<hours>\d+)hour)?((?P<minutes>\d+)min)?$")
 
     def do(self, args):
         try:
-            call = LinuxRemote.actions[args["action"]]
-        except Exception:
-            raise Exception("Unknown action")
+            call = self.actions[args["action"][0]]
+        except Exception as e:
+            print(e)
+            raise ARModuleError("Unknown action")
         else:
-            call(**args)
+            return call(**args)
 
-    def shutdown(self, time, **kwargs):
-        # TODO Finish this function
+    def shutdown(self, time=[None], **kwargs):
+        time = time[0]
         if time is None:
             subprocess.call(["gnome-session-quit", "--power-off"])
         elif isinstance(time, str) and self.timeRe.match(time) is not None:
-            subprocess.call(["at", "now", "+", time],
-                            stdin=b"DISPLAY=" + bytes(self.display, "ascii") +
-                            b"gnome-session-quit --power-off")
-        print("success")
+            proc = subprocess.Popen(["at", "now", "+", time],
+                    stdin=subprocess.PIPE, stdout=subprocess.DEVNULL)
+            proc.communicate(input=b"DISPLAY=" + bytes(self.display, "ascii") +
+                             b" gnome-session-quit --power-off")
+            proc.wait()
+        else:
+            raise ARModuleError("Invalid date")
+        return "success"
