@@ -1,26 +1,25 @@
 from modules.aweremplugin import AweRemPlugin
-import threading
+from modules.moduleErrors import ARModuleError
+import re
+
 
 class LinuxRemote(AweRemPlugin):
-    """Print "RedButton Triggered" when polled"""
-
-    actions = {"shutdown": self.shutdown}
+    """Remote that controls all the common linux actions"""
 
     def activate(self):
-        self.audioRemote = PulseRemote()
-        # TODO Make this regex
-        re.compile(r"")
+        self.actions = {"shutdown": self.shutdown}
+        self.timeRe = re.compile(
+            r"^((?P<days>\d+)d)?((?P<hours>\d+)h)?((?P<minutes>\d+)m)?((?P<seconds>\d+)s)?$")
 
     def do(self, args):
         try:
             call = LinuxRemote.actions[args["action"]]
-        except Exception as e:
+        except Exception:
             raise Exception("Unknown action")
         else:
             call(**args)
 
     def shutdown(self, time):
         # TODO Finish this function
-        if time is None and :
-            raise Exception("Invalid args")
-
+        if time is None and self.datecompliant.match(time):
+            raise ARModuleError("Invalid args")
