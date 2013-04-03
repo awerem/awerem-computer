@@ -34,7 +34,7 @@ class AweRemHTTPHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         modulename = self.getModuleNameFromPath(self.path)
-        args = urllib.parse.parse_qs(self.path)
+        args = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
         self.callModule(modulename, args)
 
     def callModule(self, module, args):
