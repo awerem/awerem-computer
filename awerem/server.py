@@ -1,9 +1,9 @@
-#!/bin/env python3
+#!/bin/env python
 
-from http.server import HTTPServer
-from http.server import SimpleHTTPRequestHandler
+from SocketServer import TCPServer as HTTPServer
+from SimpleHTTPServer import SimpleHTTPRequestHandler
 import re
-import urllib.parse
+import urlparse
 import json
 from yapsy.PluginManager import PluginManagerSingleton
 from yapsy.PluginFileLocator import (PluginFileLocator,
@@ -34,7 +34,7 @@ class AweRemHTTPHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         modulename = self.getModuleNameFromPath(self.path)
-        args = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        args = urlparse.parse_qs(urlparse.urlparse(self.path).query)
         self.callModule(modulename, args)
 
     def callModule(self, module, args):
