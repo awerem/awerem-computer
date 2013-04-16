@@ -2,6 +2,7 @@ from modules.aweremplugin import AweRemPlugin
 import re
 import os
 import subprocess
+from threading import Timer
 from modules.moduleErrors import ARModuleError
 
 
@@ -12,7 +13,9 @@ class LinuxRemote(AweRemPlugin):
         self.actions = {"shutdown": self.shutdown}
         self.display = os.environ["DISPLAY"]
         self.timeRe = re.compile(
-            r"^((?P<days>\d+)day)?((?P<hours>\d+)hour)?((?P<minutes>\d+)min)?$")
+            r"^((?P<days>\d+)d)?((?P<hours>\d+)h)?((?P<minutes>\d+)m)?"
+            r"((?P<seconds>\d+)s)?$")
+        self.shutTimer = None
 
     def do(self, args):
         try:
@@ -27,12 +30,29 @@ class LinuxRemote(AweRemPlugin):
         time = time[0]
         if time is None:
             subprocess.call(["gnome-session-quit", "--power-off"])
-        elif isinstance(time, str) and self.timeRe.match(time) is not None:
-            proc = subprocess.Popen(["at", "now", "+", time],
-                    stdin=subprocess.PIPE, stdout=subprocess.DEVNULL)
-            proc.communicate(input=b"DISPLAY=" + bytes(self.display, "ascii") +
-                             b" gnome-session-quit --power-off")
-            proc.wait()
         else:
-            raise ARModuleError("Invalid date")
-        return "success"
+            try:
+                m = self.timeRe.match(time)
+            except TypeError:
+                raise ARModuleError("Invalid date")
+            else:
+                if m is not None:
+                    days = int(m.group("days") or 0)
+                    hours = int(m.group("hours") or 0)
+                    minutes = int(m.group("minutes") or 0)
+                    seconds = int(m.group("seconds") or 0)
+                    shutTime = (days * 24 * 3600 + hours * 3600 + minutes * 60
+                                + seconds)
+                    try:
+                        self.shutTimer.cancel()
+                    except:
+                        pass
+                    self.shutTimer = Timer(shutTime,
+                                           lambda: subprocess.call(
+                                           ["gnome-session-quit", "--power-off"]))
+                    self.shutTimer.daemon = True
+                    self.shutTimer.start()
+
+                else:
+                    raise ARModuleError("Invalid date")
+        return "shutdown triggered"
