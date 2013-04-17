@@ -1,24 +1,17 @@
 #!/bin/env python
+# -*- coding:utf8 -*-
 
-from SocketServer import TCPServer as HTTPServer
-from SimpleHTTPServer import SimpleHTTPRequestHandler
-import re
-import urlparse
-import json
+from twisted.web import xmlrpc, server
 from yapsy.PluginManager import PluginManagerSingleton
 from yapsy.PluginFileLocator import (PluginFileLocator,
                                      PluginFileAnalyzerWithInfoFile)
 from modules.aweremplugin import AweRemPlugin
 
 
-class AweRemHTTPHandler(SimpleHTTPRequestHandler):
-    """The HTTPHandler for AweRem"""
-    server_version = "AweRemHTTP/0.1"
-    unknownModule = 1 << 1
-    moduleError = 1 << 2
-    moduleregex = re.compile(r"module/([a-z]+)")
+class ModulesManager(xmlrpc.XMLRPC):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
+        xmlrpc.XMLRPC.__init__(self)
         pluginLocator = PluginFileLocator()
         pluginLocator.setPluginPlaces(["modules"])
         pluginLocator.appendAnalyzer(
@@ -29,50 +22,10 @@ class AweRemHTTPHandler(SimpleHTTPRequestHandler):
         self.pm.collectPlugins()
         for plugin in self.pm.getAllPlugins():
             self.pm.activatePluginByName(plugin.name)
+            self.putSubHandler(plugin.name, plugin.plugin_object.getHandler())
 
-        SimpleHTTPRequestHandler.__init__(self, *args, **kwargs)
-
-    def do_GET(self):
-        modulename = self.getModuleNameFromPath(self.path)
-        args = urlparse.parse_qs(urlparse.urlparse(self.path).query)
-        self.callModule(modulename, args)
-
-    def callModule(self, module, args):
-        try:
-            plugin = self.pm.getPluginByName(module)
-            if plugin is None:
-                raise Exception("Plugin " + module + " not found")
-            message = plugin.plugin_object.do(args)
-        except Exception as e:
-            error = json.dumps({"error": str(e)})
-            self.sendError(AweRemHTTPHandler.moduleError, error)
-        else:
-            self.sendSuccess(json.dumps(message))
-
-    def sendError(self, errorType, jsonMessage):
-        if(errorType == AweRemHTTPHandler.unknownModule):
-            self.send_response(404, "Not Found")
-        else:
-            self.send_response(500, "Internal Server Error")
-        self.send_header("Content-type", "application/json; charset=utf-8")
-        self.end_headers()
-        self.wfile.write(jsonMessage.encode('utf-8'))
-
-    def sendSuccess(self, jsonMessage):
-        self.send_response(200, "OK")
-        self.send_header("Content-type", "application/json; charset=utf-8")
-        self.end_headers()
-        self.wfile.write(jsonMessage.encode('utf-8'))
-
-    @staticmethod
-    def getModuleNameFromPath(path):
-        match = AweRemHTTPHandler.moduleregex.search(path)
-        if match is not None:
-            ret = match.group(1)
-        else:
-            ret = "__empty__"
-        return ret
-
-if __name__ == "__main__":
-    httpd = HTTPServer(('', 34340), AweRemHTTPHandler)
-    httpd.serve_forever()
+if __name__ == '__main__':
+    from twisted.internet import reactor
+    r = ModulesManager()
+    reactor.listenTCP(34340, server.Site(r))
+    reactor.run()

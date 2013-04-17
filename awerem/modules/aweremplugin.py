@@ -5,8 +5,8 @@ class AweRemPlugin(IPlugin):
     """Interface for the AweRem modules"""
 
     def activate(self):
-        print("activated")
+        raise NotImplementedError("Shouldn't be called")
 
-    def do(self, args):
-        """Called when an http request is done"""
-        raise Exception("Shouldn't be called")
+    def getHandler(self):
+        """Returns the xmlrpc handler for the plugin"""
+        raise NotImplementedError("Shouldn't be called")
