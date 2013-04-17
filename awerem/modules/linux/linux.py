@@ -1,58 +1,53 @@
 from modules.aweremplugin import AweRemPlugin
-import re
-import os
 import subprocess
-from threading import Timer
-from modules.moduleErrors import ARModuleError
+from twisted.web import xmlrpc
+from twisted.internet import reactor
+
+
+class LinuxHandler(xmlrpc.XMLRPC):
+    """
+    XMLRPC Handler for Linux Remote
+    """
+    def __init__(self, linux):
+        xmlrpc.XMLRPC.__init__(self)
+        self.linux = linux
+
+    def xmlrpc_shutdown(self, seconds=0, minutes=0, hours=0, days=0):
+        """
+        Shutdown the computer at the given time
+        seconds - The number of seconds to wait
+        minutes - The number of minutes to wait
+        hours - the number of hours to wait
+        days - the number of days to wait
+        """
+        s = int(seconds)
+        m = int(minutes)
+        h = int(hours)
+        d = int(days)
+        if s >= 0 and m >= 0 and h >= 0 and d >= 0:
+            return self.linux.shutdown(s, m, h, d)
+        else:
+            raise ValueError("date must be positive")
 
 
 class LinuxRemote(AweRemPlugin):
-    """Print "RedButton Triggered" when polled"""
+    """
+    Some controls for Linux systems.
+    """
 
     def activate(self):
-        self.actions = {"shutdown": self.shutdown}
-        self.display = os.environ["DISPLAY"]
-        self.timeRe = re.compile(
-            r"^((?P<days>\d+)d)?((?P<hours>\d+)h)?((?P<minutes>\d+)m)?"
-            r"((?P<seconds>\d+)s)?$")
         self.shutTimer = None
+        self.handler = LinuxHandler(self)
 
-    def do(self, args):
+    def getHandler(self):
+        return self.handler
+
+    def shutdown(self, s, m, h, d):
+        shutTime = d * 24 * 3600 + h * 3600 + m * 60 + s
         try:
-            call = self.actions[args["action"][0]]
-        except Exception as e:
-            print(e)
-            raise ARModuleError("Unknown action")
-        else:
-            return call(**args)
-
-    def shutdown(self, time=[None], **kwargs):
-        time = time[0]
-        if time is None:
-            subprocess.call(["gnome-session-quit", "--power-off"])
-        else:
-            try:
-                m = self.timeRe.match(time)
-            except TypeError:
-                raise ARModuleError("Invalid date")
-            else:
-                if m is not None:
-                    days = int(m.group("days") or 0)
-                    hours = int(m.group("hours") or 0)
-                    minutes = int(m.group("minutes") or 0)
-                    seconds = int(m.group("seconds") or 0)
-                    shutTime = (days * 24 * 3600 + hours * 3600 + minutes * 60
-                                + seconds)
-                    try:
-                        self.shutTimer.cancel()
-                    except:
-                        pass
-                    self.shutTimer = Timer(shutTime,
-                                           lambda: subprocess.call(
-                                           ["gnome-session-quit", "--power-off"]))
-                    self.shutTimer.daemon = True
-                    self.shutTimer.start()
-
-                else:
-                    raise ARModuleError("Invalid date")
-        return "shutdown triggered"
+            self.shutTimer.cancel()
+        except:
+            pass
+        self.shutTimer = reactor.callLater(shutTime, lambda: subprocess.call(
+            ["gnome-session-quit", "--power-off"]))
+        return True
