@@ -2,13 +2,12 @@
 # -*- coding:utf8 -*-
 
 from twisted.web import xmlrpc, server
-from twisted.web.static import File
-from twisted.web.resource import Resource, NoResource
-import os.path
+from twisted.web.resource import Resource
 from yapsy.PluginManager import PluginManagerSingleton
 from yapsy.PluginFileLocator import (PluginFileLocator,
                                      PluginFileAnalyzerWithInfoFile)
 from modules.aweremplugin import AweRemPlugin
+from uimanager import UIManager
 
 
 def init_pm():
@@ -34,24 +33,6 @@ class ActionsManager(xmlrpc.XMLRPC):
         self.pm = PluginManagerSingleton.get()
         for plugin in self.pm.getAllPlugins():
             self.putSubHandler(plugin.name, plugin.plugin_object.getHandler())
-
-
-class UIManager(Resource):
-    """
-    Resource that manage all the ui provided by the plugins
-    """
-
-    def __init__(self):
-        Resource.__init__(self)
-        self.pm = PluginManagerSingleton.get()
-
-    def getChild(self, name, request):
-        try:
-            plugin = self.pm.getPluginByName(name)
-        except:
-            return NoResource()
-        else:
-            return File(os.path.join(os.path.dirname(plugin.path), "ui.html"))
 
 
 class ConfigureManager(xmlrpc.XMLRPC):
