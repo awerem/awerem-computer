@@ -3,6 +3,7 @@
 
 from twisted.web import xmlrpc, server
 from twisted.web.resource import Resource
+from twisted.web.static import File
 from yapsy.PluginManager import PluginManagerSingleton
 from yapsy.PluginFileLocator import (PluginFileLocator,
                                      PluginFileAnalyzerWithInfoFile)
@@ -45,5 +46,6 @@ if __name__ == '__main__':
     r.putChild("action", ActionsManager())
     r.putChild("ui", UIManager())
     r.putChild("configure", ConfigureManager())
+    r.putChild("resources", File("resources"))
     reactor.listenTCP(34340, server.Site(r))
     reactor.run()

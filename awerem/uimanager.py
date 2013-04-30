@@ -15,8 +15,13 @@ class UIElement(Element):
     """
     loader = XMLFile(FilePath("resources/ui.tpl.html"))
 
-    def __init__(self, ui):
+    def __init__(self, name):
         Element.__init__(self)
+        self.pm = PluginManagerSingleton.get()
+        self.name = name
+        path = os.path.join(os.path.dirname(
+            self.pm.getPluginByName(name).path), "ui.html")
+        ui = FilePath(path)
         self.headContent = ""
         self.bodyContent = ""
         headState = 0
@@ -41,6 +46,10 @@ class UIElement(Element):
         return tag(self.headContent)
 
     @renderer
+    def moduleName(self, request, tag):
+        return tag(self.name)
+
+    @renderer
     def body(self, request, tag):
         return tag(self.bodyContent)
 
@@ -50,15 +59,16 @@ class UI(Resource):
     Write the UI of the plugin
     """
 
-    def __init__(self, path):
+    def __init__(self, name):
         Resource.__init__(self)
-        self.pluginpath = path
-        self.elem = UIElement(FilePath(os.path.join(path, "ui.html")))
+        self.pm = PluginManagerSingleton.get()
+        self.pluginpath = self.pm.getPluginByName(name).path
+        self.elem = UIElement(name)
 
     def getChild(self, name, request):
         try:
             return File(os.path.join(self.pluginpath, name))
-        except:
+        except None:
             return NoResource()
 
     def render_GET(self, request):
@@ -82,9 +92,9 @@ class UIManager(Resource):
 
     def getChild(self, name, request):
         try:
-            path = os.path.dirname(self.pm.getPluginByName(name).path)
-            ui = UI(path)
-        except:
+            self.pm.getPluginByName(name)
+            ui = UI(name)
+        except None:
             return NoResource()
         else:
             return ui
