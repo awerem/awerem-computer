@@ -5,13 +5,14 @@
 		<title>AweRem</title>
 		<script type="text/javascript" src="/resources/mimic.js">
 		</script>
-		<script type="text/javascript" src="/resources/xmlrpc.js">
-		var moduleName = "<t:transparent t:render="moduleName" />"
+		<script type="text/javascript">
+			var moduleName = "{MODULENAME}"
 		</script>
-		<t:transparent t:render="head"/>
+		<script type="text/javascript" src="/resources/xmlrpc.js">
+		</script>
+		{HEAD}
 	</head>
 	<body>
-		<h1>It works</h1>
-		<t:transparent t:render="body"/>
+		{BODY}
 	</body>
 </html>

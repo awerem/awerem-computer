@@ -4,81 +4,51 @@ from yapsy.PluginManager import PluginManagerSingleton
 from twisted.web.resource import Resource, NoResource
 from twisted.web.static import File
 import os.path
-from twisted.web.template import Element, renderer, XMLFile, flatten
+import re
 from twisted.python.filepath import FilePath
-from twisted.web.server import NOT_DONE_YET
-
-
-class UIElement(Element):
-    """
-    Fill the template in resources/ui.html with the plugin specific needs.
-    """
-    loader = XMLFile(FilePath("resources/ui.tpl.html"))
-
-    def __init__(self, name):
-        Element.__init__(self)
-        self.pm = PluginManagerSingleton.get()
-        self.name = name
-        path = os.path.join(os.path.dirname(
-            self.pm.getPluginByName(name).path), "ui.html")
-        ui = FilePath(path)
-        self.headContent = ""
-        self.bodyContent = ""
-        headState = 0
-        bodyState = 0
-        with ui.open() as file:
-            for line in file:
-                if headState == 1:
-                    self.headContent += line
-                if bodyState == 1:
-                    self.bodyContent += line
-                if headState == 0 and line.find("<head>"):
-                    headState = 1
-                if headState == 1 and line.find("</head>"):
-                    headState == 2
-                if bodyState == 0 and headState != 1 and line.find("<body>"):
-                    bodyState = 1
-                if bodyState == 1 and line.find("</body>"):
-                    bodyState = 2
-
-    @renderer
-    def head(self, request, tag):
-        return tag(self.headContent)
-
-    @renderer
-    def moduleName(self, request, tag):
-        return tag(self.name)
-
-    @renderer
-    def body(self, request, tag):
-        return tag(self.bodyContent)
 
 
 class UI(Resource):
     """
     Write the UI of the plugin
     """
+    template = FilePath("resources/ui.tpl.html")
 
     def __init__(self, name):
         Resource.__init__(self)
         self.pm = PluginManagerSingleton.get()
-        self.pluginpath = self.pm.getPluginByName(name).path
-        self.elem = UIElement(name)
+        self.name = name
+        self.pluginpath = os.path.dirname(self.pm.getPluginByName(name).path)
+        path = os.path.join(self.pluginpath, "ui.html")
+        ui = FilePath(path)
+        self.headContent = ""
+        self.bodyContent = ""
+        content = ""
+        with ui.open() as f:
+            for line in f:
+                content += line
+        head = re.search(r"<head>(\n)?(.*)(\n)?</head>", content, re.DOTALL)
+        if head is not None:
+            self.headContent = head.group(1)
+        body = re.search(r"<body>(.*)</body>", content, re.DOTALL)
+        if body is not None:
+            self.bodyContent = body.group(1)
 
     def getChild(self, name, request):
         try:
             return File(os.path.join(self.pluginpath, name))
-        except None:
+        except:
             return NoResource()
 
     def render_GET(self, request):
-        d = flatten(request, self.elem, request.write)
-
-        def done(ignored):
-            request.finish()
-            return ignored
-        d.addBoth(done)
-        return NOT_DONE_YET
+        with UI.template.open() as f:
+            for line in f:
+                line = line.replace("{HEAD}", self.headContent)
+                line = line.replace("{BODY}", self.bodyContent)
+                line = line.replace("{MODULENAME}", self.name)
+                request.write(line)
+        request.finish()
+        return True
 
 
 class UIManager(Resource):
@@ -94,7 +64,7 @@ class UIManager(Resource):
         try:
             self.pm.getPluginByName(name)
             ui = UI(name)
-        except None:
+        except:
             return NoResource()
         else:
             return ui

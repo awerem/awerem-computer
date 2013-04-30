@@ -1,15 +1,21 @@
-function sendAction(action, params)
+aweremClass = function(module)
 {
-    var request = new XmlRpcRequest("/actions/"+moduleName, action);
-    for (var param in params)
+    this.moduleName = module
+    this.sendAction = function(action, params)
     {
-        request.addParam(param);
+	var request = new XmlRpcRequest("/action", this.moduleName+"."+action);
+	for (var param in params)
+	{
+	    request.addParam(param);
+	}
+	return request.send().parseXML();
     }
-    return request.send().parseXML();
-}
 
 
-function asyncSendAction(callback, action, params)
-{
-    return false;
+    this.asyncSendAction = function(callback, action, params)
+    {
+	return false;
+    }
 }
+
+var awerem = new aweremClass(moduleName);
