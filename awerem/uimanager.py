@@ -27,7 +27,7 @@ class UI(Resource):
         with ui.open() as f:
             for line in f:
                 content += line
-        head = re.search(r"<head>(\n)?(.*)(\n)?</head>", content, re.DOTALL)
+        head = re.search(r"<head>(.*)</head>", content, re.DOTALL)
         if head is not None:
             self.headContent = head.group(1)
         body = re.search(r"<body>(.*)</body>", content, re.DOTALL)
@@ -35,10 +35,13 @@ class UI(Resource):
             self.bodyContent = body.group(1)
 
     def getChild(self, name, request):
-        try:
-            return File(os.path.join(self.pluginpath, name))
-        except:
-            return NoResource()
+        if name != "":
+            try:
+                return File(os.path.join(self.pluginpath, name))
+            except:
+                return NoResource()
+        else:
+            return self
 
     def render_GET(self, request):
         with UI.template.open() as f:
