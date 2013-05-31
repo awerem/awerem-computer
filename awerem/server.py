@@ -1,5 +1,4 @@
 #!/bin/env python
-# -*- coding:utf8 -*-
 
 from twisted.web import xmlrpc, server
 from twisted.web.resource import Resource
@@ -9,6 +8,7 @@ from yapsy.PluginFileLocator import (PluginFileLocator,
                                      PluginFileAnalyzerWithInfoFile)
 from modules.aweremplugin import AweRemPlugin
 from uimanager import UIManager
+from coremanager import CoreManager
 
 
 def init_pm():
@@ -43,6 +43,7 @@ if __name__ == '__main__':
     from twisted.internet import reactor
     init_pm()
     r = Resource()
+    r.putChild("core", CoreManager())
     r.putChild("action", ActionsManager())
     r.putChild("ui", UIManager())
     r.putChild("configure", ConfigureManager())
