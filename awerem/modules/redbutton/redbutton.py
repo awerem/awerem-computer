@@ -1,3 +1,5 @@
+#!/bin/python
+
 from modules.aweremplugin import AweRemPlugin
 from twisted.web import xmlrpc
 
@@ -11,7 +13,7 @@ class RedButtonHandler(xmlrpc.XMLRPC):
         """
         Print "RedButton Triggered"
         """
-        print "RedButton Triggered"
+        print("RedButton Triggered")
         return True
 
 
@@ -25,3 +27,7 @@ class RedButton(AweRemPlugin):
 
     def getHandler(self):
         return self.handler
+
+    def getInfo(self):
+        return {"title": "RedButton", "category": "contextual",
+                "priority": 0, "icon": None}

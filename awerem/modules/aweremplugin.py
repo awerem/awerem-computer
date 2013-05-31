@@ -14,12 +14,14 @@ class AweRemPlugin(IPlugin):
     def getInfo(self):
         """Returns informations about the plugin in a dict.
         The dictionnary must be like this:
-            name: The true name of the module
             title: The title displayed to the user
             category: "contextual" or "utils"
+            icon: The relative path to the icon of the module
             priority: 0  - The app the module controls has the focus
                       1  - The app the module controls is launched
                       2  - The app the module controls is system-wide
                       -1 - The app the module controls is not launched (won't
                            be displayed)"""
+        return {"title": "Not Implemented", "icon": None,
+                "category": "contextual", "priority": 2}
         raise NotImplementedError("Shouldn't be called")

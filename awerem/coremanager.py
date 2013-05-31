@@ -20,5 +20,6 @@ class CoreManager(Resource):
         """Return the list of the plugin"""
         plugins = []
         for plugin in self.pm.getAllPlugins():
-            plugins.append(plugin.getInfo())
-        return json.dump(plugins)
+            plugins.append(dict(plugin.plugin_object.getInfo(),
+                                name=plugin.name))
+        return json.dumps(plugins)
