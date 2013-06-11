@@ -3,6 +3,9 @@
 from twisted.web import xmlrpc, server
 from twisted.web.resource import Resource
 from twisted.web.static import File
+
+from twisted.internet.protocol import DatagramProtocol
+
 from yapsy.PluginManager import PluginManagerSingleton
 from yapsy.PluginFileLocator import (PluginFileLocator,
                                      PluginFileAnalyzerWithInfoFile)
@@ -23,6 +26,21 @@ def init_pm():
     for plugin in pm.getAllPlugins():
         pm.activatePluginByName(plugin.name)
     return pm
+
+
+class UDPDiscover(DatagramProtocol):
+    """
+    Respond when a client tries to discover the server in the local network
+    """
+
+    def datagramReceived(self, data, (host, port)):
+        print("received %s from %s:%d" % (data, host, port))
+        lines = data.split("\n")
+        if lines[0] == "awerem" and lines[1] == "ping":
+            print("yeah")
+            self.transport.write("awerem\npong\n" + lines[2] + "\n",
+                                 (host, port))
+            self.transport.loseConnection()
 
 
 class ActionsManager(xmlrpc.XMLRPC):
@@ -49,4 +67,5 @@ if __name__ == '__main__':
     r.putChild("configure", ConfigureManager())
     r.putChild("resources", File("resources"))
     reactor.listenTCP(34340, server.Site(r))
+    reactor.listenMulticast(34340, UDPDiscover())
     reactor.run()
