@@ -34,13 +34,10 @@ class UDPDiscover(DatagramProtocol):
     """
 
     def datagramReceived(self, data, (host, port)):
-        print("received %s from %s:%d" % (data, host, port))
         lines = data.split("\n")
         if lines[0] == "awerem" and lines[1] == "ping":
-            print("yeah")
             self.transport.write("awerem\npong\n" + lines[2] + "\n",
                                  (host, port))
-            self.transport.loseConnection()
 
 
 class ActionsManager(xmlrpc.XMLRPC):
@@ -67,5 +64,5 @@ if __name__ == '__main__':
     r.putChild("configure", ConfigureManager())
     r.putChild("resources", File("resources"))
     reactor.listenTCP(34340, server.Site(r))
-    reactor.listenMulticast(34340, UDPDiscover())
+    reactor.listenUDP(34340, UDPDiscover())
     reactor.run()
