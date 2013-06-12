@@ -25,3 +25,6 @@ class AweRemPlugin(IPlugin):
         return {"title": "Not Implemented", "icon": None,
                 "category": "contextual", "priority": 2}
         raise NotImplementedError("Shouldn't be called")
+
+    def getIconPath(self, dpi):
+        return "res/icons/icon_" + dpi + ".png"

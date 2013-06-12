@@ -31,3 +31,6 @@ class RedButton(AweRemPlugin):
     def getInfo(self):
         return {"title": "RedButton", "category": "contextual",
                 "priority": 0, "icon": None}
+
+    def getIconPath(self, dpi):
+        return "res/icons/icon_mdpi.png"

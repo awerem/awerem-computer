@@ -1,5 +1,3 @@
-# -*- coding:utf-8 -*-
-
 from yapsy.PluginManager import PluginManagerSingleton
 from twisted.web.resource import Resource, NoResource
 from twisted.web.static import File
@@ -44,6 +42,24 @@ class UI(Resource):
             return self
 
     def render_GET(self, request):
+        try:
+            get = request.args["get"][0]
+            dpi = request.args["dpi"][0]
+        except:
+            pass
+        else:
+            if get == "icon":
+                try:
+                    with open(os.path.join(self.pluginpath,
+                              self.pm.getPluginByName(self.name)
+                              .plugin_object.getIconPath(dpi)), "rb") as im:
+                        request.setHeader('Content-type', 'image/png')
+                        for line in im:
+                            request.write(line)
+                except IOError:
+                    request.setHeader('Response-code', '404')
+            request.finish()
+            return True
         with UI.template.open() as f:
             for line in f:
                 line = line.replace("{HEAD}", self.headContent)
