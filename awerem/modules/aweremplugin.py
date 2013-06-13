@@ -22,7 +22,7 @@ class AweRemPlugin(IPlugin):
                       2  - The app the module controls is system-wide
                       -1 - The app the module controls is not launched (won't
                            be displayed)"""
-        return {"title": "Not Implemented", "icon": None,
+        return {"title": "Not Implemented",
                 "category": "contextual", "priority": 2}
         raise NotImplementedError("Shouldn't be called")
 
