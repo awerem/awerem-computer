@@ -12,9 +12,10 @@ from yapsy.PluginFileLocator import (PluginFileLocator,
 from modules.aweremplugin import AweRemPlugin
 from uimanager import UIManager
 from coremanager import CoreManager
+from pollmanager import PollManager
 
 
-def init_pm():
+def init_pm(pollmanager):
     pluginLocator = PluginFileLocator()
     pluginLocator.setPluginPlaces(["modules"])
     pluginLocator.appendAnalyzer(
@@ -25,6 +26,7 @@ def init_pm():
     pm.collectPlugins()
     for plugin in pm.getAllPlugins():
         pm.activatePluginByName(plugin.name)
+        plugin.plugin_object.setPollManager(pollmanager)
     return pm
 
 
@@ -56,9 +58,10 @@ class ConfigureManager(xmlrpc.XMLRPC):
 
 if __name__ == '__main__':
     from twisted.internet import reactor
-    init_pm()
+    pollmanager = PollManager()
+    init_pm(pollmanager)
     r = Resource()
-    r.putChild("core", CoreManager())
+    r.putChild("core", CoreManager(pollmanager))
     r.putChild("action", ActionsManager())
     r.putChild("ui", UIManager())
     r.putChild("configure", ConfigureManager())

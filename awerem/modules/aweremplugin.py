@@ -28,3 +28,6 @@ class AweRemPlugin(IPlugin):
 
     def getIconPath(self, dpi):
         return "res/icons/icon_" + dpi + ".png"
+
+    def setPollManager(self, pollmanager):
+        self.pollmanager = pollmanager
