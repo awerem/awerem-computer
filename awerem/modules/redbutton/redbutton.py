@@ -14,7 +14,7 @@ class RedButtonHandler(xmlrpc.XMLRPC):
         Print "RedButton Triggered"
         """
         print("RedButton Triggered")
-        self.redbutton.pollmanager.addInfo("redbutton", "redbutton")
+        self.redbutton.pollmanager.addInfo("redbutton")
         return True
 
 

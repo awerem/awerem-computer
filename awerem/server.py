@@ -12,7 +12,7 @@ from yapsy.PluginFileLocator import (PluginFileLocator,
 from modules.aweremplugin import AweRemPlugin
 from uimanager import UIManager
 from coremanager import CoreManager
-from pollmanager import PollManager
+from pollmanager import PollManager, PollManagerBind
 
 
 def init_pm(pollmanager):
@@ -26,7 +26,8 @@ def init_pm(pollmanager):
     pm.collectPlugins()
     for plugin in pm.getAllPlugins():
         pm.activatePluginByName(plugin.name)
-        plugin.plugin_object.setPollManager(pollmanager)
+        plugin.plugin_object.setPollManager(PollManagerBind(plugin.name,
+                                                            pollmanager))
     return pm
 
 
