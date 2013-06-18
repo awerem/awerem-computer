@@ -1,6 +1,19 @@
 import json
 
 
+class PollManagerBind():
+
+    def __init__(self, pollmanager, moduleName):
+        self.pollmanager = pollmanager
+        self.moduleName = moduleName
+
+    def addInfo(self, infos):
+        self.pollmanager.addInfo(self.moduleName, infos)
+
+    def updateNavigationDrawer(self):
+        self.pollmanager.addInfo("core", "UpdateNavigationDrawer")
+
+
 class PollManager():
 
     def __init__(self):
