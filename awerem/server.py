@@ -26,8 +26,8 @@ def init_pm(pollmanager):
     pm.collectPlugins()
     for plugin in pm.getAllPlugins():
         pm.activatePluginByName(plugin.name)
-        plugin.plugin_object.setPollManager(PollManagerBind(plugin.name,
-                                                            pollmanager))
+        plugin.plugin_object.setPollManager(PollManagerBind(pollmanager,
+                                                            plugin.name))
     return pm
 
 
