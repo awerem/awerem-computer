@@ -38,4 +38,4 @@ class PollManager():
             self.request.write(json.dumps(self.infoDict))
             self.request.finish()
             self.infoDict = {}
-            self.requet = None
+            self.request = None
