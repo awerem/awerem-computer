@@ -4,6 +4,7 @@ from twisted.web import xmlrpc
 from twisted.internet import reactor
 import platform
 import re
+import json
 
 
 class LinuxHandler(xmlrpc.XMLRPC):
@@ -14,7 +15,7 @@ class LinuxHandler(xmlrpc.XMLRPC):
         xmlrpc.XMLRPC.__init__(self)
         self.linux = linux
 
-    def xmlrpc_shutdown(self, seconds=0, minutes=0, hours=0, days=0):
+    def xmlrpc_shutdown(self, jsontime):
         """
         Shutdown the computer at the given time
         seconds - The number of seconds to wait
@@ -22,10 +23,11 @@ class LinuxHandler(xmlrpc.XMLRPC):
         hours - the number of hours to wait
         days - the number of days to wait
         """
-        s = int(seconds)
-        m = int(minutes)
-        h = int(hours)
-        d = int(days)
+        time = json.loads(jsontime)
+        s = int(time['seconds'])
+        m = int(time['minutes'])
+        h = int(time['hours'])
+        d = int(time['days'])
         if s >= 0 and m >= 0 and h >= 0 and d >= 0:
             return self.linux.shutdown(s, m, h, d)
         else:
@@ -36,15 +38,15 @@ class LinuxHandler(xmlrpc.XMLRPC):
         Update the volume of the system at the given percentage
         volume - the percentage of the volume to be set
         """
-        vol = int(volume)
+        vol = int(json.loads(volume))
         if vol > 100:
             vol = 100
         elif vol < 0:
             vol = 0
-        return self.linux.updateVolume(vol)
+        return json.dumps(self.linux.updateVolume(vol))
 
-    def xmlrpc_getVolume(self):
-        return self.linux.getVolume()
+    def xmlrpc_getCurrentVolume(self):
+        return self.linux.getCurrentVolume()
 
 
 class LinuxRemote(AweRemPlugin):
