@@ -72,6 +72,16 @@ class LinuxRemote(AweRemPlugin):
             ["gnome-session-quit", "--power-off"]))
         return True
 
+    def getCurrentVolume(self):
+        try:
+            sinks_info = subprocess.check_output(["pacmd", "list-sinks"])
+            sinks_info.lower()
+        except subprocess.CalledProcessError:
+            print("pulseaudio is not used")
+        else:
+            return re.search(r"\*.*?volume.*?(\d+)%", sinks_info,
+                             re.DOTALL).group(1)
+
     def updateVolume(self, volume):
         volume = int(volume)
         if volume > 100:
@@ -81,14 +91,14 @@ class LinuxRemote(AweRemPlugin):
         succeeded_once = False
         try:
             sinks_list = subprocess.check_output(["pactl", "list", "short",
-                                                  "sinks"])
+                                                  "sinks"]).lower()
         except subprocess.CalledProcessError:
             print("pulseaudio is not used")
         else:
-            for match in re.findIter(r"^(\d+).*?running", sinks_list,
+            for match in re.finditer(r"^(\d+).*?running", sinks_list,
                                      re.MULTILINE):
                 sink = match.group(1)
-                volume_str = volume + "%"
+                volume_str = str(volume) + "%"
                 try:
                     subprocess.call(["pactl", "set-sink-volume", sink,
                                      volume_str])
@@ -98,7 +108,7 @@ class LinuxRemote(AweRemPlugin):
                     succeeded_once = True
             if succeeded_once:  # If it succeeded, plays a little sound
                 try:
-                    subprocess.call(["canberra-gtk-play",
+                    subprocess.Popen(["canberra-gtk-play",
                                      "--id=audio-volume-change"])
                 except:
                     pass
