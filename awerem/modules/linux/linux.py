@@ -33,20 +33,25 @@ class LinuxHandler(xmlrpc.XMLRPC):
         else:
             raise ValueError("date must be positive")
 
-    def xmlrpc_updateVolume(self, volume):
+    def xmlrpc_updateVolume(self, jsonstr):
         """
         Update the volume of the system at the given percentage
         volume - the percentage of the volume to be set
         """
-        vol = int(json.loads(volume))
+        data = json.loads(jsonstr)
+        vol = int(data["volume"])
+        beep = bool(data["beep"])
         if vol > 100:
             vol = 100
         elif vol < 0:
             vol = 0
-        return json.dumps(self.linux.updateVolume(vol))
+        return json.dumps(self.linux.updateVolume(vol, beep))
 
     def xmlrpc_getCurrentVolume(self, unused):
         return self.linux.getCurrentVolume()
+
+    def xmlrpc_beep(self, unused):
+        self.linux.beep()
 
 
 class LinuxRemote(AweRemPlugin):
@@ -99,7 +104,7 @@ class LinuxRemote(AweRemPlugin):
             return re.search(r"\*.*?volume.*?(\d+)%", sinks_info,
                              re.DOTALL).group(1)
 
-    def updateVolume(self, volume):
+    def updateVolume(self, volume, beep):
         succeeded_once = False
         try:
             sinks_list = subprocess.check_output(["pactl", "list", "short",
@@ -118,10 +123,13 @@ class LinuxRemote(AweRemPlugin):
                     pass
                 else:
                     succeeded_once = True
-            if succeeded_once:  # If it succeeded, plays a little sound
-                try:
-                    subprocess.Popen(["canberra-gtk-play",
-                                     "--id=audio-volume-change"])
-                except:
-                    pass
+            if succeeded_once and beep:
+                self.beep()
         return self.getCurrentVolume()
+
+    def beep(self):
+        try:
+            subprocess.Popen(["canberra-gtk-play",
+                              "--id=audio-volume-change"])
+        except:
+            pass
