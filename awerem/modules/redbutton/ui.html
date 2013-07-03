@@ -1,21 +1,28 @@
 <!DOCTYPE html>
 <html>
     <head>
-		<link rel="stylesheet" type="text/css" href="res/style.css"/>
+		<link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.light.css" id="jQMnDTheme"/>
+		<link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.color.red.css" id="jQMnDColor"/>
 	</head>
 	<body>
-		<div id="container">
-			<p id="cell">
-				<button type="button" id="redbutton">REDBUTTON</button>
-			</p>
+		<div data-role="page" data-theme="b">
+			<div data-role="content">
+				<form>
+				<ul data-role="listview" data-inset="true">
+					<li>
+						<fieldset>
+						<button type="button" id="redbutton" data-icon="off">Redbutton</button>
+						</fieldset>
+					</li>
+				</ul>
+				</form>
+			</div>
 		</div>
 		<script type="text/javascript">
-			document.getElementById("redbutton").addEventListener(
-					"click", function(e){
+			$('#redbutton').click(function(e){
 				awerem.tick("redbutton")
 				awerem.sendAction("press", [])
-				awerem.tack()},
-					false);
+				awerem.tack()});
 		</script>
 	</body>
 </html>
