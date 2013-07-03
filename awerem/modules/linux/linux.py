@@ -45,7 +45,7 @@ class LinuxHandler(xmlrpc.XMLRPC):
             vol = 0
         return json.dumps(self.linux.updateVolume(vol))
 
-    def xmlrpc_getCurrentVolume(self):
+    def xmlrpc_getCurrentVolume(self, unused):
         return self.linux.getCurrentVolume()
 
 
