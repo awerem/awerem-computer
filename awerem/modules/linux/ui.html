@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.light.css" id="jQMnDTheme"/>
+		<link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.color.blue.css" id="jQMnDColor"/>
+		<style type="text/css">
+		.ui-slider-input {
+    		display : none !important;
+		}
+		.slide-wrapper
+		{
+			width: 70%;
+			margin: auto;
+			margin-top: 0.5em;
+		}
+		</style>
+	</head>
+	<body>
+		<div data-role="page" data-theme="b">
+			<div data-role="content">
+				<form>
+					<div class="slide-wrapper icon-volume-down icon-large pull-left">
+						<input type="range" class="icon-volume-down" id="volumeslide" data-icon="volume-down" data-highlight="true" min="0" max="100"/>
+						<i class="icon-volume-up icon-large pull-right"></i>
+					</div>
+				</form>
+			</div>
+		</div>
+		<script type="text/javascript">
+			$(document).bind("pageinit", function(e){
+				var volume = awerem.sendAction("getCurrentVolume", "")
+				$('#volumeslide').val(volume).slider('refresh');
+				$('#volumeslide').on("change", function(e){
+					awerem.tick("volume");
+					awerem.sendAction("updateVolume", JSON.stringify({"volume":$(e.target).val(), "beep":false}));
+					awerem.tack();
+					});
+				$('#volumeslide').on("slidestop", function(e) {awerem.sendAction("beep", "");});
+			});
+		</script>
+	</body>
+</html>
