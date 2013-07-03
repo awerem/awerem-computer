@@ -31,6 +31,21 @@ class LinuxHandler(xmlrpc.XMLRPC):
         else:
             raise ValueError("date must be positive")
 
+    def xmlrpc_updateVolume(self, volume):
+        """
+        Update the volume of the system at the given percentage
+        volume - the percentage of the volume to be set
+        """
+        vol = int(volume)
+        if vol > 100:
+            vol = 100
+        elif vol < 0:
+            vol = 0
+        return self.linux.updateVolume(vol)
+
+    def xmlrpc_getVolume(self):
+        return self.linux.getVolume()
+
 
 class LinuxRemote(AweRemPlugin):
     """
@@ -83,11 +98,6 @@ class LinuxRemote(AweRemPlugin):
                              re.DOTALL).group(1)
 
     def updateVolume(self, volume):
-        volume = int(volume)
-        if volume > 100:
-            volume = 100
-        elif volume < 0:
-            volume = 0
         succeeded_once = False
         try:
             sinks_list = subprocess.check_output(["pactl", "list", "short",
