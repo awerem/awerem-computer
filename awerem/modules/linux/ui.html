@@ -7,11 +7,12 @@
 		.ui-slider-input {
     		display : none !important;
 		}
-		.slide-wrapper
+		.volumetoggler
 		{
-			width: 70%;
+			text-align: center;
 			margin: auto;
-			margin-top: 0.5em;
+			display: block;
+			width: 100;
 		}
 		</style>
 	</head>
@@ -19,10 +20,18 @@
 		<div data-role="page" data-theme="b">
 			<div data-role="content">
 				<form>
-					<div class="slide-wrapper icon-volume-down icon-large pull-left">
-						<input type="range" class="icon-volume-down" id="volumeslide" data-icon="volume-down" data-highlight="true" min="0" max="100"/>
-						<i class="icon-volume-up icon-large pull-right"></i>
+					<ul data-role="listview">
+					<li>
+					<div class="container_16" id="valign_ref">
+						<div class="grid_1">
+							<a href="#" class="volumetoggler ui-btn-inner" id="toggleute"><i class="icon-volume-up icon-large"></i></a>
+						</div>
+						<div class="grid_15">
+							<input type="range" id="volumeslide" data-icon="volume-down" data-highlight="true" min="0" max="100"/>
+						</div>
 					</div>
+					</li>
+					</ul>
 				</form>
 			</div>
 		</div>
