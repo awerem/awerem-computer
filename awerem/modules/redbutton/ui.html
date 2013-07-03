@@ -11,7 +11,10 @@
 		</div>
 		<script type="text/javascript">
 			document.getElementById("redbutton").addEventListener(
-					"click", function(e){awerem.sendAction("press", [])},
+					"click", function(e){
+				awerem.tick("redbutton")
+				awerem.sendAction("press", [])
+				awerem.tack()},
 					false);
 		</script>
 	</body>
