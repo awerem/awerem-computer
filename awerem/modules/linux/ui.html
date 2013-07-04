@@ -41,10 +41,11 @@
 				$('#volumeslide').val(volume).slider('refresh');
 				$('#volumeslide').on("change", function(e){
 					awerem.tick("volume");
-					awerem.sendAction("updateVolume", JSON.stringify({"volume":$(e.target).val(), "beep":false}));
+					awerem.sendActionAsync("updateVolume", 
+						JSON.stringify({"volume":$(e.target).val(), "beep":false}), "");
 					awerem.tack();
 					});
-				$('#volumeslide').on("slidestop", function(e) {awerem.sendAction("beep", "");});
+				$('#volumeslide').on("slidestop", function(e) {awerem.sendActionAsync("beep", "", "");});
 			});
 		</script>
 	</body>
