@@ -7,12 +7,28 @@
 		.ui-slider-input {
     		display : none !important;
 		}
-		.volumetoggler
+		html, body
+		{
+			height: 100%;
+		}
+		.top
+		{
+			position: absolute;
+			top: 25%;
+			margin-right: 10px;
+			width: 95%;
+		}
+
+		.button
 		{
 			text-align: center;
-			margin: auto;
 			display: block;
-			width: 100;
+		}
+		.bottom
+		{
+			position: absolute;
+			bottom: 25%;
+			width: 95%;
 		}
 		</style>
 	</head>
@@ -20,23 +36,93 @@
 		<div data-role="page" data-theme="b">
 			<div data-role="content">
 				<form>
-					<ul data-role="listview">
-					<li>
-					<div class="container_16" id="valign_ref">
+					<div class="container_16 top" id="valign_ref">
 						<div class="grid_1">
-							<a href="#" class="volumetoggler ui-btn-inner" id="toggleute"><i class="icon-volume-up icon-large"></i></a>
+							<a href="#" class="button ui-btn-inner"
+								id="togglemute">
+								<i class="icon-volume-up icon-2x"></i>
+							</a>
 						</div>
 						<div class="grid_15">
-							<input type="range" id="volumeslide" data-icon="volume-down" data-highlight="true" min="0" max="100"/>
+							<input type="range" id="volumeslide" data-icon="volume-down"
+								data-highlight="true" min="0" max="100"/>
 						</div>
 					</div>
-					</li>
-					</ul>
+					<div class="container_12 bottom">
+						<div class="grid_6">
+							<a href="#popupLock" data-rel="popup" data-position-to="window"
+								data-transition="pop" class="ui-btn-inner button" id="lockbutton">
+								<i class="icon-lock icon-3x"></i>
+							</a>
+						</div>
+						<div class="grid_6">
+							<a  href="#popupPowerOff" data-rel="popup" data-position-to="window"
+							   data-transition="pop" class="ui-btn-inner button" id="poweroffbutton">
+								<i class="icon-off icon-3x"></i>
+							</a>
+						</div>
+					</div>
 				</form>
 			</div>
+			<div id="popupLock" data-role="popup" data-theme="b">
+				<div data-role="header">
+					<h1>
+						Lock your session
+					</h1>
+				</div>
+				<div data-role="content">
+					<p>
+						Do you want to lock your session?<br />
+						<em>(You can't unlock it from AweRem)</em>
+					</p>
+					<div class="showastabs center nobg">
+						<a href="#" id="confirmLock" data-rel="back" data-role="button" data-icon="lock"
+							data-iconpos="left" data-inline="true">
+							Lock my session
+						</a>
+						<a href="#" data-rel="back" data-role="button" data-icon="delete"
+							data-iconpos="left" data-inline="true">
+							Cancel
+						</a>
+					</div>
+				</div>
+			</div>
+			<div id="popupPowerOff" data-role="popup" data-theme="b">
+				<div data-role="header">
+					<h1>
+						Shutdown your computer
+					</h1>
+				</div>
+				<div data-role="content">
+					<p>
+						Do you want to shutdown your computer?<br />
+						<em>(You can't turn it on from AweRem unless you have activated Wake on Lan)</em>
+					</p>
+					<div class="showastabs center nobg">
+						<a href="#" data-rel="back" data-role="button" data-icon="off"
+							data-iconpos="left" data-inline="true">
+							Power off
+						</a>
+						<a href="#" data-rel="back" data-role="button" data-icon="rotate-right"
+							data-iconpos="left" data-inline="true">
+							Reboot
+						</a>
+
+						<a href="#" data-rel="back" data-role="button" data-icon="delete"
+							data-iconpos="left" data-inline="true">
+							Cancel
+						</a>
+					</div>
+				</div>
+			</div>
 		</div>
-		<script type="text/javascript">
+
+			<script type="text/javascript">
+
 			$(document).bind("pageinit", function(e){
+				//////////////
+				/// Volume ///
+				//////////////
 				var volume = awerem.sendAction("getCurrentVolume", "")
 				$('#volumeslide').val(volume).slider('refresh');
 				$('#volumeslide').on("change", function(e){
@@ -46,6 +132,17 @@
 					awerem.tack();
 					});
 				$('#volumeslide').on("slidestop", function(e) {awerem.sendActionAsync("beep", "", "");});
+
+				///////////////
+				/// Locking ///
+				///////////////
+				$('#confirmLock').tap(function(e) { awerem.sendActionAsync("lock", "", "");});
+
+				/////////////////
+				/// Power Off ///
+				/////////////////
+				$('#confirmPowerOff').tap(function(e) { awerem.sendActionAsync("shutdown", "", "");});
+				$('#confirmReboot').tap(function(e) { awerem.sendActionAsync("reboot", "", "");});
 			});
 		</script>
 	</body>
