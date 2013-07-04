@@ -51,7 +51,7 @@ class LinuxHandler(xmlrpc.XMLRPC):
         return self.linux.getCurrentVolume()
 
     def xmlrpc_beep(self, unused):
-        self.linux.beep()
+        return json.dumps(self.linux.beep())
 
 
 class LinuxRemote(AweRemPlugin):
@@ -133,3 +133,4 @@ class LinuxRemote(AweRemPlugin):
                               "--id=audio-volume-change"])
         except:
             pass
+        return True
