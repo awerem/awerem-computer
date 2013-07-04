@@ -99,11 +99,11 @@
 						<em>(You can't turn it on from AweRem unless you have activated Wake on Lan)</em>
 					</p>
 					<div class="showastabs center nobg">
-						<a href="#" data-rel="back" data-role="button" data-icon="off"
+						<a href="#" id="confirmPowerOff" data-rel="back" data-role="button" data-icon="off"
 							data-iconpos="left" data-inline="true">
 							Power off
 						</a>
-						<a href="#" data-rel="back" data-role="button" data-icon="rotate-right"
+						<a href="#" id="confirmReboot" data-rel="back" data-role="button" data-icon="rotate-right"
 							data-iconpos="left" data-inline="true">
 							Reboot
 						</a>
@@ -141,8 +141,12 @@
 				/////////////////
 				/// Power Off ///
 				/////////////////
-				$('#confirmPowerOff').tap(function(e) { awerem.sendActionAsync("shutdown", "", "");});
-				$('#confirmReboot').tap(function(e) { awerem.sendActionAsync("reboot", "", "");});
+				$('#confirmPowerOff').tap(function(e) {
+				   	awerem.sendActionAsync("shutdown", "", "");
+				});
+				$('#confirmReboot').tap(function(e) { 
+					awerem.sendActionAsync("shutdown", JSON.stringify({"mode": "reboot"}), "");
+				});
 			});
 		</script>
 	</body>

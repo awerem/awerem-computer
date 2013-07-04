@@ -15,21 +15,38 @@ class LinuxHandler(xmlrpc.XMLRPC):
         xmlrpc.XMLRPC.__init__(self)
         self.linux = linux
 
-    def xmlrpc_shutdown(self, jsontime):
+    def xmlrpc_shutdown(self, jsonstr):
         """
         Shutdown the computer at the given time
         seconds - The number of seconds to wait
         minutes - The number of minutes to wait
         hours - the number of hours to wait
-        days - the number of days to wait
+        mode - The action to do: "power-off", "reboot"
         """
-        time = json.loads(jsontime)
-        s = int(time['seconds'])
-        m = int(time['minutes'])
-        h = int(time['hours'])
-        d = int(time['days'])
-        if s >= 0 and m >= 0 and h >= 0 and d >= 0:
-            return self.linux.shutdown(s, m, h, d)
+        if jsonstr:
+            data = json.loads(jsonstr)
+        else:
+            data = {}
+        try:
+            s = int(data['seconds'])
+        except:
+            s = 0
+        try:
+            m = int(data['minutes'])
+        except:
+            m = 0
+        try:
+            h = int(data['hours'])
+        except:
+            h = 0
+        try:
+            mode = str(data['mode'])
+        except:
+            mode = "power-off"
+        if mode != "power-off" and mode != "reboot":
+            mode = "power-off"
+        if s >= 0 and m >= 0 and h >= 0:
+            return json.dumps(self.linux.shutdown(mode, s, m, h))
         else:
             raise ValueError("date must be positive")
 
@@ -84,14 +101,18 @@ class LinuxRemote(AweRemPlugin):
             else:
                 return "Linux"
 
-    def shutdown(self, s, m, h, d):
-        shutTime = d * 24 * 3600 + h * 3600 + m * 60 + s
+    def shutdown(self, mode, s, m, h):
+        print(mode)
+        shutTime = h * 3600 + m * 60 + s
         try:
             self.shutTimer.cancel()
         except:
             pass
-        self.shutTimer = reactor.callLater(shutTime, lambda: subprocess.call(
-            ["gnome-session-quit", "--power-off"]))
+        if mode == "power-off" or mode == "reboot":
+            mode = "--" + mode
+            self.shutTimer = reactor.callLater(
+                shutTime, lambda: subprocess.call(["gnome-session-quit",
+                                                   mode]))
         return True
 
     def getCurrentVolume(self):
