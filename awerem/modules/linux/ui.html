@@ -40,7 +40,7 @@
 						<div class="grid_1">
 							<a href="#" class="button ui-btn-inner"
 								id="togglemute">
-								<i class="icon-volume-up icon-2x"></i>
+								<i id="togglemuteicon" class="icon-volume-up icon-2x"></i>
 							</a>
 						</div>
 						<div class="grid_15">
@@ -136,12 +136,28 @@
 					}
 					};
 				var volumeChanger = new VolumeChanger();
-				var volume = awerem.sendAction("getCurrentVolume", "")
-				$('#volumeslide').val(volume).slider('refresh');
 				$('#volumeslide').on("change", function(e) {volumeChanger.volumeChange($(e.target).val(), false);});
+				$('#volumeslide').on("change", function(e) {
+					var vol = $(e.target).val();
+					if (vol == 0)
+					{
+						$("#togglemuteicon").removeClass("icon-volume-up icon-volume-down icon-volume-off").addClass("icon-volume-off");
+					}
+					else if (vol < 50)
+					{
+						$("#togglemuteicon").removeClass("icon-volume-up icon-volume-down icon-volume-off").addClass("icon-volume-down");
+					}
+					else
+					{
+						$("#togglemuteicon").removeClass("icon-volume-up icon-volume-down icon-volume-off").addClass("icon-volume-up");
+					}
+				});
 				$('#volumeslide').on("slidestop", function(e) {
 					volumeChanger.volumeChange($(e.target).val(), true);
 					awerem.sendActionAsync("beep", "", "");});
+
+				var volume = awerem.sendAction("getCurrentVolume", "")
+				$('#volumeslide').val(volume).slider('refresh');
 
 				///////////////
 				/// Locking ///
