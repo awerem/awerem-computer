@@ -125,12 +125,12 @@
 				//////////////
 				VolumeChanger = function () {
 					this.before = 0;
-					this.volumeChange = function(e, force)
+					this.volumeChange = function(vol, force)
 					{
 						if (new Date().getTime() - this.before > 100 || force)
 						{
 							awerem.sendActionAsync("updateVolume",
-								JSON.stringify({"volume":$(e.target).val(), "beep":false}), "");
+								JSON.stringify({"volume":vol, "beep":false}), "");
 							this.before = new Date().getTime();
 						}
 					}
@@ -138,9 +138,9 @@
 				var volumeChanger = new VolumeChanger();
 				var volume = awerem.sendAction("getCurrentVolume", "")
 				$('#volumeslide').val(volume).slider('refresh');
-				$('#volumeslide').on("change", function(e) {volumeChanger.volumeChange(e, false);});
+				$('#volumeslide').on("change", function(e) {volumeChanger.volumeChange($(e.target).val(), false);});
 				$('#volumeslide').on("slidestop", function(e) {
-					volumeChanger.volumeChange(e, true);
+					volumeChanger.volumeChange($(e.target).val(), true);
 					awerem.sendActionAsync("beep", "", "");});
 
 				///////////////
