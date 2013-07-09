@@ -123,15 +123,25 @@
 				//////////////
 				/// Volume ///
 				//////////////
+				VolumeChanger = function () {
+					this.before = 0;
+					this.volumeChange = function(e, force)
+					{
+						if (new Date().getTime() - this.before > 100 || force)
+						{
+							awerem.sendActionAsync("updateVolume",
+								JSON.stringify({"volume":$(e.target).val(), "beep":false}), "");
+							this.before = new Date().getTime();
+						}
+					}
+					};
+				var volumeChanger = new VolumeChanger();
 				var volume = awerem.sendAction("getCurrentVolume", "")
 				$('#volumeslide').val(volume).slider('refresh');
-				$('#volumeslide').on("change", function(e){
-					awerem.tick("volume");
-					awerem.sendActionAsync("updateVolume", 
-						JSON.stringify({"volume":$(e.target).val(), "beep":false}), "");
-					awerem.tack();
-					});
-				$('#volumeslide').on("slidestop", function(e) {awerem.sendActionAsync("beep", "", "");});
+				$('#volumeslide').on("change", function(e) {volumeChanger.volumeChange(e, false);});
+				$('#volumeslide').on("slidestop", function(e) {
+					volumeChanger.volumeChange(e, true);
+					awerem.sendActionAsync("beep", "", "");});
 
 				///////////////
 				/// Locking ///
@@ -144,7 +154,7 @@
 				$('#confirmPowerOff').tap(function(e) {
 				   	awerem.sendActionAsync("shutdown", "", "");
 				});
-				$('#confirmReboot').tap(function(e) { 
+				$('#confirmReboot').tap(function(e) {
 					awerem.sendActionAsync("shutdown", JSON.stringify({"mode": "reboot"}), "");
 				});
 			});
