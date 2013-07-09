@@ -128,12 +128,11 @@ class LinuxRemote(AweRemPlugin):
     def updateVolume(self, volume, beep):
         succeeded_once = False
         try:
-            sinks_list = subprocess.check_output(["pactl", "list", "short",
-                                                  "sinks"]).lower()
+            sinks_list = subprocess.check_output(["pacmd", "list-sinks"]).lower()
         except subprocess.CalledProcessError:
             print("pulseaudio is not used")
         else:
-            for match in re.finditer(r"^(\d+).*?running", sinks_list,
+            for match in re.finditer(r"\*.*index.*(\d+)", sinks_list,
                                      re.MULTILINE):
                 sink = match.group(1)
                 volume_str = str(volume) + "%"
