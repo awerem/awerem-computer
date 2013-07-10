@@ -32,6 +32,14 @@ class MouseHandler(xmlrpc.XMLRPC):
         y = int(movement["y"])
         return json.dumps(self.mouse.move(x, y))
 
+    def xmlrpc_press(self, jsonstr):
+        button = int(json.loads(jsonstr))
+        return self.mouse.press(button)
+
+    def xmlrpc_release(self, jsonstr):
+        button = int(json.loads(jsonstr))
+        return self.mouse.release(button)
+
 
 class MouseRemote(AweRemPlugin):
     """
