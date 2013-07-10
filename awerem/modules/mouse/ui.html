@@ -28,7 +28,7 @@
             lastCheck = 0;
             $('#trackzone').tap(function(e){
                     $('#trackzone').text("tapped");
-                    awerem.sendActionAsync("click", JSON.stringify(1));
+                    awerem.sendActionAsync("click", JSON.stringify(1), "");
                     });
             $('#trackzone').on("touchstart", function(e) {
                     before = e.originalEvent.targetTouches[0];
