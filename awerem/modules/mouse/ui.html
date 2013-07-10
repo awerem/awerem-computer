@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-		<link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.light.css" id="jQMnDTheme"/>
+        <link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.light.css" id="jQMnDTheme"/>
         <link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.color.red.css" id="jQMnDColor"/>
         <style type="text/css">
             html, body, .whole
@@ -16,18 +16,35 @@
                 background: #aaa;
             }
         </style>
-	</head>
-	<body>
-		<div data-role="page" data-theme="b" class="whole">
+    </head>
+    <body>
+        <div data-role="page" data-theme="b" class="whole">
             <div data-role="content" class="whole">
                 <div id="trackzone"></div>
-			</div>
-		</div>
-		<script type="text/javascript">
-			$('#trackzone').tap(function(e){
-				console.log("tapped");
-				awerem.sendActionAsync("click", JSON.stringify(1), "");
-			});
-		</script>
-	</body>
+            </div>
+        </div>
+        <script type="text/javascript">
+            before = {};
+            lastCheck = 0;
+            $('#trackzone').tap(function(e){
+                    $('#trackzone').text("tapped");
+                    awerem.sendActionAsync("click", JSON.stringify(1));
+                    });
+            $('#trackzone').on("touchstart", function(e) {
+                    before = e.originalEvent.targetTouches[0];
+                    lastCheck = new Date().getTime()
+                    });
+            $('#trackzone').on("touchmove", function(e) {
+                if (new Date().getTime() - lastCheck > 50)
+                {
+                    lastCheck = new Date().getTime();
+                    x = e.originalEvent.targetTouches[0].pageX - before.pageX;
+                    y = e.originalEvent.targetTouches[0].pageY - before.pageY;
+                    before = e.originalEvent.targetTouches[0];
+                    $('#trackzone').text("X: " + x + ", Y: " + y);
+                    awerem.sendActionAsync("move", JSON.stringify({"x": x, "y": y}), "");
+                }
+            });
+        </script>
+    </body>
 </html>
