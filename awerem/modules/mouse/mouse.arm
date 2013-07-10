@@ -1,0 +1,10 @@
+[Core]
+
+Name = mouse
+Module = mouse
+
+[Documentation]
+
+Author = Paul Ecoffet
+Version = 0.2
+Description = Mouse controls

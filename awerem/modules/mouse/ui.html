@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.light.css" id="jQMnDTheme"/>
+        <link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.color.red.css" id="jQMnDColor"/>
+        <style type="text/css">
+            html, body, .whole
+            {
+                width: 100%;
+                height: 100%;
+            }
+            #trackzone
+            {
+                width: 100%;
+                height: 100%;
+                background: #aaa;
+            }
+        </style>
+	</head>
+	<body>
+		<div data-role="page" data-theme="b" class="whole">
+            <div data-role="content" class="whole">
+                <div id="trackzone"></div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			$('#trackzone').tap(function(e){
+				console.log("tapped");
+				awerem.sendActionAsync("click", JSON.stringify(1), "");
+			});
+		</script>
+	</body>
+</html>
