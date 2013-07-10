@@ -5,6 +5,7 @@ from twisted.web import xmlrpc
 import json
 from pymouse import PyMouse
 
+
 class MouseHandler(xmlrpc.XMLRPC):
 
     def __init__(self, mouse):
@@ -15,11 +16,11 @@ class MouseHandler(xmlrpc.XMLRPC):
         Click with the mouse at the current position
         """
         try:
-	        mouse_click = int(json.loads(jsonstr))
+            mouse_click = int(json.loads(jsonstr))
         except Exception as e:
             raise e
         else:
-	        return self.mouse.click(mouse_click)
+            return self.mouse.click(mouse_click)
 
     def xmlrpc_move(self, jsonstr):
         """
@@ -29,7 +30,7 @@ class MouseHandler(xmlrpc.XMLRPC):
         movement = json.loads(jsonstr)
         x = int(movement["x"])
         y = int(movement["y"])
-        self.mouse.move(x, y)
+        return json.dumps(self.mouse.move(x, y))
 
 
 class MouseRemote(AweRemPlugin):
@@ -50,7 +51,7 @@ class MouseRemote(AweRemPlugin):
         return self.info
 
     def getIconPath(self, dpi):
-        return None
+        return ""
 
     def click(self, button, x=None, y=None):
         curx, cury = self.realMouse.position()
@@ -81,11 +82,11 @@ class MouseRemote(AweRemPlugin):
 
     def move(self, deltaX, deltaY):
         curx, cury = self.realMouse.position()
-        if x is None:
-            x = curx + deltaX
-        if y is None:
-            y = cury + deltaY
-        self.realMouse.move(x, y)
+        if deltaX is not None:
+            curx += deltaX
+        if deltaY is not None:
+            cury += deltaY
+        self.realMouse.move(curx, cury)
         return True
 
     def moveAbsolute(self, x, y):
