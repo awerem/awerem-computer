@@ -19,6 +19,11 @@ class RedButtonHandler(xmlrpc.XMLRPC):
         self.redbutton.pollmanager.updateNavigationDrawer()
         return True
 
+    def xmlrpc_custompress(self, message):
+        print("Custom message: " + str(message))
+        print(type(message))
+        return True
+
 
 class RedButton(AweRemPlugin):
     """

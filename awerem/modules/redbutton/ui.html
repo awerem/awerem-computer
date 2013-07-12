@@ -12,6 +12,7 @@
 					<li>
 						<fieldset>
 						<button type="button" id="redbutton" data-icon="off">Redbutton</button>
+						<button type="button" id="custombutton" data-icon="linux">Custombutton</button>
 						</fieldset>
 					</li>
 				</ul>
@@ -19,8 +20,10 @@
 			</div>
 		</div>
 		<script type="text/javascript">
-			$('#redbutton').click(function(e){
+			$('#redbutton').tap(function(e){
 				awerem.sendAction("press")});
+			$('#custombutton').tap(function(e){
+				awerem.sendAction("custompress", "Custom")});
 		</script>
 	</body>
 </html>
