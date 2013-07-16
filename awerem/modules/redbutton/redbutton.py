@@ -1,15 +1,14 @@
 #!/bin/python
 
-from modules.aweremplugin import AweRemPlugin
-from twisted.web import xmlrpc
+from modules.aweremplugin import AweRemPlugin, AweRemHandler
 
 
-class RedButtonHandler(xmlrpc.XMLRPC):
+class RedButtonHandler(AweRemHandler):
 
     def __init__(self, redbutton):
         self.redbutton = redbutton
 
-    def xmlrpc_press(self):
+    def out_press(self):
         """
         Print "RedButton Triggered"
         """
@@ -19,7 +18,7 @@ class RedButtonHandler(xmlrpc.XMLRPC):
         self.redbutton.pollmanager.updateNavigationDrawer()
         return True
 
-    def xmlrpc_custompress(self, message):
+    def out_custompress(self, message):
         print("Custom message: " + str(message))
         print(type(message))
         return True

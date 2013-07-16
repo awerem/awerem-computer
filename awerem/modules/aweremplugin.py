@@ -1,4 +1,5 @@
 from yapsy.IPlugin import IPlugin
+from twisted.web import xmlrpc
 
 
 class AweRemPlugin(IPlugin):
@@ -31,3 +32,20 @@ class AweRemPlugin(IPlugin):
 
     def setPollManager(self, pollmanager):
         self.pollmanager = pollmanager
+
+
+class AweRemHandler(xmlrpc.XMLRPC):
+    """
+    All the plugin handlers must inherit from this class
+    """
+
+    def __init__(self):
+        xmlrpc.XMLRPC.__init__(self)
+
+    def lookupProcedure(self, procedurePath):
+        try:
+            return getattr(self, "out_" + procedurePath)
+        except:
+            raise xmlrpc.NoSuchFunction(
+                self.NOT_FOUND,
+                "procedure %s not found" % procedurePath)
