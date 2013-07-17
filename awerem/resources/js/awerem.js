@@ -33,12 +33,12 @@ var awerem = new function()
         this._id++;
     };
 
-    this.triggerCallback = function(id)
+    this.triggerCallback = function(id, jsonstr)
     {
         if(typeof(this._callbacks[id]) === "function")
         {
-            var args = Array.prototype.slice.call(arguments, 1);
-            this._callbacks[id].apply(this, args);
+            arg = JSON.parse(jsonstr)
+            this._callbacks[id](arg);
         }
     };
 
@@ -46,15 +46,17 @@ var awerem = new function()
     {
         type = typeof arg;
         if(type === "string")
-            _awerem.addString(curid, arg)
+            _awerem.addString(curid, arg);
         else if (type === "boolean")
-            _awerem.addString(curid, arg)
+        {
+            _awerem.addBool(curid, arg);
+        }
         else if (type === "number")
         {
             if (parseFloat(arg) == parseInt(arg, 10) && !isNaN(arg))
-                _awerem.addInt(arg)
+                _awerem.addInt(arg);
             else
-                _awerem.addFloat(arg)
+                _awerem.addFloat(arg);
         }
     };
 }();

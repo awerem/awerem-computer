@@ -13,7 +13,8 @@ from modules.aweremplugin import AweRemPlugin
 from uimanager import UIManager
 from coremanager import CoreManager
 from pollmanager import PollManager, PollManagerBind
-
+import logging
+logging.basicConfig()
 
 def init_pm(pollmanager):
     pluginLocator = PluginFileLocator()
