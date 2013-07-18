@@ -1,44 +1,41 @@
 #!/bin/python
 
-from modules.aweremplugin import AweRemPlugin
-from twisted.web import xmlrpc
-import json
+from modules.aweremplugin import AweRemPlugin, AweRemHandler
 from pymouse import PyMouse
 
 
-class MouseHandler(xmlrpc.XMLRPC):
+class MouseHandler(AweRemHandler):
 
     def __init__(self, mouse):
         self.mouse = mouse
 
-    def xmlrpc_click(self, jsonstr):
+    def out_click(self, button):
         """
         Click with the mouse at the current position
         """
-        try:
-            mouse_click = int(json.loads(jsonstr))
-        except Exception as e:
-            raise e
-        else:
-            return self.mouse.click(mouse_click)
+        button = int(button)
+        self.mouse.click(button)
+        return True
 
-    def xmlrpc_move(self, jsonstr):
+    def out_move(self, x, y):
         """
         Move the mouse relatively at its current position
         jsonstr - The json string received
         """
-        movement = json.loads(jsonstr)
-        x = int(movement["x"])
-        y = int(movement["y"])
-        return json.dumps(self.mouse.move(x, y))
+        x = int(x)
+        y = int(y)
+        self.mouse.move(x, y)
+        return True
 
-    def xmlrpc_press(self, jsonstr):
-        button = int(json.loads(jsonstr))
-        return self.mouse.press(button)
+    def out_press(self, button):
+        button = int(button)
+        self.mouse.press(button)
+        return True
 
-    def xmlrpc_release(self, jsonstr):
-        button = int(json.loads(jsonstr))
-        return self.mouse.release(button)
+    def out_release(self, button):
+        button = int(button)
+        self.mouse.release(button)
+        return True
 
 
 class MouseRemote(AweRemPlugin):
@@ -68,7 +65,6 @@ class MouseRemote(AweRemPlugin):
         if y is None:
             y = cury
         self.realMouse.click(x, y, button)
-        return True
 
     def press(self, button, x=None, y=None):
         curx, cury = self.realMouse.position()
@@ -77,7 +73,6 @@ class MouseRemote(AweRemPlugin):
         if y is None:
             y = cury
         self.realMouse.press(x, y, button)
-        return True
 
     def release(self, button, x=None, y=None):
         curx, cury = self.realMouse.position()
@@ -86,7 +81,6 @@ class MouseRemote(AweRemPlugin):
         if y is None:
             y = cury
         self.realMouse.release(x, y, button)
-        return True
 
     def move(self, deltaX, deltaY):
         curx, cury = self.realMouse.position()
@@ -95,8 +89,6 @@ class MouseRemote(AweRemPlugin):
         if deltaY is not None:
             cury += deltaY
         self.realMouse.move(curx, cury)
-        return True
 
     def moveAbsolute(self, x, y):
         self.realMouse.move(x, y)
-        return True

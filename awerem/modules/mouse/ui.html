@@ -52,7 +52,7 @@
                 lastCheck = 0;
                 $('#trackzone').tap(function(e){
                         $('#trackzone').text("tapped");
-                        awerem.sendActionAsync("click", JSON.stringify(1), "");
+                        awerem.sendActionAsync("click", 1);
                         });
                 $('#trackzone').on("touchstart", function(e) {
                         before = e.originalEvent.targetTouches[0];
@@ -66,24 +66,24 @@
                         y = e.originalEvent.targetTouches[0].pageY - before.pageY;
                         before = e.originalEvent.targetTouches[0];
                         $('#trackzone').text("X: " + x + ", Y: " + y);
-                        awerem.sendActionAsync("move", JSON.stringify({"x": x, "y": y}), "");
+                        awerem.sendActionAsync("move", x, y);
                     }
                     });
                 $("#left").on("touchstart", function(e) {
                         $("#left").addClass("ui-btn-down-b")
-                        awerem.sendActionAsync("press", JSON.stringify(1), "");
+                        awerem.sendActionAsync("press", 1);
                         });
                 $("#left").on("touchend", function(e) {
                         $("#left").removeClass("ui-btn-down-b")
-                        awerem.sendActionAsync("release", JSON.stringify(1), "");
+                        awerem.sendActionAsync("release", 1);
                         });
                 $("#right").on("touchstart", function(e) {
                         $("#right").addClass("ui-btn-down-b")
-                        awerem.sendActionAsync("press", JSON.stringify(2), "");
+                        awerem.sendActionAsync("press", 2);
                         });
                 $("#right").on("touchend", function(e) {
                         $("#right").removeClass("ui-btn-down-b")
-                        awerem.sendActionAsync("release", JSON.stringify(2), "");
+                        awerem.sendActionAsync("release", 2);
                         });
                 });
         </script>
