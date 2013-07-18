@@ -54,9 +54,9 @@ var awerem = new function()
         else if (type === "number")
         {
             if (parseFloat(arg) == parseInt(arg, 10) && !isNaN(arg))
-                _awerem.addInt(arg);
+                _awerem.addInt(curid, arg);
             else
-                _awerem.addFloat(arg);
+                _awerem.addFloat(curid, arg);
         }
     };
 }();
