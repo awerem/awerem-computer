@@ -1,6 +1,6 @@
 #!/bin/python
 import psutil
-from twisted.web import task, threads
+from twisted.internet import task, threads
 
 
 class ProcessesManager():
@@ -11,16 +11,20 @@ class ProcessesManager():
 
     def __init__(self):
         self.callbacks = []
+        self.timer = task.LoopingCall(self.triggerCallbacks)
 
     def start(self):
-        task.loopingCall(self.triggerCallbacks, 3)
+        self.timer.start(3)
 
-    def register(self, regex, callback):
+    def stop(self):
+        self.timer.stop()
+
+    def addCallback(self, regex, callback):
         self.callbacks.append({"regex": regex, "callback": callback,
-                               "running": True})
-        return self.callbacks.length
+                               "running": False})
+        return len(self.callbacks)
 
-    def unregister(self, id):
+    def removeCallback(self, id):
         self.callbacks[id] = None
 
     def triggerCallbacks(self):
