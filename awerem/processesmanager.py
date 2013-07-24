@@ -49,3 +49,13 @@ class ProcessesManager():
     def _executeCallbacks(self, callbacks):
         for callback in callbacks:
             callback()
+
+class ProcessesManagerSingleton():
+
+    __instance = None
+
+    @classmethod
+    def get(cls):
+        if cls.__instance is None:
+            cls.__instance = ProcessesManager()
+        return cls.__instance
