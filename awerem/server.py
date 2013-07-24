@@ -13,8 +13,11 @@ from modules.aweremplugin import AweRemPlugin
 from uimanager import UIManager
 from coremanager import CoreManager
 from pollmanager import PollManager, PollManagerBind
+from processesmanager import ProcessesManagerSingleton
+
 import logging
 logging.basicConfig()
+
 
 def init_pm(pollmanager):
     pluginLocator = PluginFileLocator()
@@ -61,6 +64,8 @@ class ConfigureManager(xmlrpc.XMLRPC):
 if __name__ == '__main__':
     from twisted.internet import reactor
     pollmanager = PollManager()
+    procmanager = ProcessesManagerSingleton.get()
+    procmanager.start()
     init_pm(pollmanager)
     r = Resource()
     r.putChild("core", CoreManager(pollmanager))
