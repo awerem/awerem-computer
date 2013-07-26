@@ -42,13 +42,15 @@ class ProcessesManager():
                     break
             if ((not running and elem["running"]) or
                     (running and not elem["running"])):
-                callbacks_to_trigger.append(lambda: elem["callback"](running))
+                callbacks_to_trigger.append(lambda:
+                                            (elem["callback"](running)))
             elem["running"] = running
         return callbacks_to_trigger
 
     def _executeCallbacks(self, callbacks):
         for callback in callbacks:
             callback()
+
 
 class ProcessesManagerSingleton():
 
