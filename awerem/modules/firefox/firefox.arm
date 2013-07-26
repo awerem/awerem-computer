@@ -1,0 +1,9 @@
+[Core]
+
+Name = firefox
+Module = firefox
+
+[Documentation]
+Author = Paul Ecoffet
+Version = 0.2
+Description = Control Firefox and the compatible websites running inside
