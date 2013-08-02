@@ -1,4 +1,6 @@
 #!/bin/python
+import re
+
 import psutil
 from twisted.internet import task, threads
 
@@ -37,19 +39,22 @@ class ProcessesManager():
         for elem in validCallbacks:
             running = False
             for process in psutil.process_iter():
-                if elem["regex"].search(process.name):
+                if re.search(elem["regex"], process.name):
                     running = True
                     break
             if ((not running and elem["running"]) or
                     (running and not elem["running"])):
-                callbacks_to_trigger.append(lambda:
-                                            (elem["callback"](running)))
+                callbacks_to_trigger.append(self._create_call(
+                    elem["callback"], running))
             elem["running"] = running
         return callbacks_to_trigger
 
     def _executeCallbacks(self, callbacks):
         for callback in callbacks:
             callback()
+
+    def _create_call(self, call, state):
+        return lambda: call(state)
 
 
 class ProcessesManagerSingleton():

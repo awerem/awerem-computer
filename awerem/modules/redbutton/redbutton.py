@@ -1,7 +1,5 @@
 #!/bin/python
 
-import re
-
 from modules.aweremplugin import AweRemPlugin, AweRemHandler
 from processesmanager import ProcessesManagerSingleton
 
@@ -37,7 +35,7 @@ class RedButton(AweRemPlugin):
         self.info = {"title": "RedButton", "category": "contextual",
                      "priority": 0}
         self.procmanager = ProcessesManagerSingleton.get()
-        self.procmanager.addCallback(re.compile(r".*sleep.*"),
+        self.procmanager.addCallback(r".*sleep.*",
                                      self.sleepchange)
 
     def sleepchange(self, running):
