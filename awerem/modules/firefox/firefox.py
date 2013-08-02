@@ -1,7 +1,5 @@
 #!/bin/python
 
-import re
-
 from modules.aweremplugin import AweRemPlugin, AweRemHandler
 from processesmanager import ProcessesManagerSingleton
 
@@ -33,7 +31,7 @@ class Firefox(AweRemPlugin):
         self.info = {"title": "Firefox", "category": "contextual",
                      "priority": -1}
         self.procmanager = ProcessesManagerSingleton.get()
-        self.procmanager.addCallback(re.compile(r".*firefox.*"),
+        self.procmanager.addCallback(r".*firefox.*",
                                      self.state_change)
 
     def state_change(self, running):
