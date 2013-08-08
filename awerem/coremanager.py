@@ -1,11 +1,13 @@
 #!/bin/env python
-
+from __future__ import print_function
 import json
 from twisted.internet.task import deferLater
 from twisted.web.resource import Resource
 from twisted.web.server import NOT_DONE_YET
 from yapsy.PluginManager import PluginManagerSingleton
 from twisted.internet import reactor
+
+import messagemanager
 
 
 class CoreManager(Resource):
@@ -23,7 +25,13 @@ class CoreManager(Resource):
         try:
             get = request.args["get"][0]
         except:
-            pass
+            try:
+                message = request.args["set"][0]
+                dest = request.args["dest"][0]
+            except:
+                pass
+            else:
+                messagemanager.add_message(dest, json.loads(message))
         else:
             if get == "plugin_list":
                 return self.pluginsList()
