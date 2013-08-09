@@ -1,0 +1,9 @@
+[Core]
+
+Name = 9gag
+Module = gag
+
+[Documentation]
+Author = Paul Ecoffet
+Version = 0.2
+Description = Control a 9gag webpage
