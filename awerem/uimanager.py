@@ -16,7 +16,8 @@ class UI(Resource):
         Resource.__init__(self)
         self.pm = PluginManagerSingleton.get()
         self.name = name
-        self.pluginpath = os.path.dirname(self.pm.getPluginByName(name).path)
+        self.pluginpath = os.path.join(
+            os.path.dirname(self.pm.getPluginByName(name).path), "ui")
         path = os.path.join(self.pluginpath, "ui.html")
         ui = FilePath(path)
         self.headContent = ""
