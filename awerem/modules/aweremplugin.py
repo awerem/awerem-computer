@@ -6,10 +6,11 @@ class AweRemPlugin(IPlugin):
     """Interface for the AweRem modules"""
 
     def activate(self):
+        """Called when the plugin is activated"""
         raise NotImplementedError("Shouldn't be called")
 
     def getHandler(self):
-        """Returns the xmlrpc handler for the plugin"""
+        """Returns the AweremPluginHandler for the plugin"""
         raise NotImplementedError("Shouldn't be called")
 
     def getInfo(self):
@@ -17,7 +18,6 @@ class AweRemPlugin(IPlugin):
         The dictionnary must be like this:
             title: The title displayed to the user
             category: "contextual" or "utils"
-            icon: The relative path to the icon of the module
             priority: 0  - The app the module controls has the focus
                       1  - The app the module controls is launched
                       2  - The app the module controls is system-wide
@@ -28,6 +28,7 @@ class AweRemPlugin(IPlugin):
         raise NotImplementedError("Shouldn't be called")
 
     def getIconPath(self, dpi):
+        """Returns the path of the icon depending of the dpi of the phone"""
         return "res/icons/icon_" + dpi + ".png"
 
     def setPollManager(self, pollmanager):
@@ -43,6 +44,7 @@ class AweRemHandler(xmlrpc.XMLRPC):
         xmlrpc.XMLRPC.__init__(self)
 
     def lookupProcedure(self, procedurePath):
+        """Abstract the protocol behind the Handler"""
         try:
             return getattr(self, "out_" + procedurePath)
         except:
