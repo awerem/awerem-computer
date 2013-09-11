@@ -23,9 +23,11 @@ class UI(Resource):
         self.headContent = ""
         self.bodyContent = ""
         content = ""
-        with ui.open() as f:
-            for line in f:
-                content += line
+        try:
+            with ui.open() as f:
+                content = f.readlines()
+        except IOError:
+            pass
         head = re.search(r"<head>(.*)</head>", content, re.DOTALL)
         if head is not None:
             self.headContent = head.group(1)
@@ -37,7 +39,7 @@ class UI(Resource):
         if name != "":
             try:
                 return File(os.path.join(self.pluginpath, name))
-            except:
+            except IOError:
                 return NoResource()
         else:
             return self
@@ -46,7 +48,7 @@ class UI(Resource):
         try:
             get = request.args["get"][0]
             dpi = request.args["dpi"][0]
-        except:
+        except KeyError:
             pass
         else:
             if get == "icon":
@@ -59,14 +61,15 @@ class UI(Resource):
                             request.write(line)
                 except IOError:
                     request.setHeader('Response-code', '404')
-            request.finish()
-            return True
-        with UI.template.open() as f:
-            for line in f:
-                line = line.replace("{HEAD}", self.headContent)
-                line = line.replace("{BODY}", self.bodyContent)
-                line = line.replace("{MODULENAME}", self.name)
-                request.write(line)
+        try:
+            with UI.template.open() as f:
+                for line in f:
+                    line = line.replace("{HEAD}", self.headContent)
+                    line = line.replace("{BODY}", self.bodyContent)
+                    line = line.replace("{MODULENAME}", self.name)
+                    request.write(line)
+        except IOError:
+            request.setHeader('Response-code', '404')
         request.finish()
         return True
 
@@ -81,10 +84,7 @@ class UIManager(Resource):
         self.pm = PluginManagerSingleton.get()
 
     def getChild(self, name, request):
-        try:
-            self.pm.getPluginByName(name)
-            ui = UI(name)
-        except:
+        if self.pm.getPluginByName(name) is None:
             return NoResource()
         else:
-            return ui
+            return UI(name)
