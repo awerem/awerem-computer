@@ -25,7 +25,7 @@ class UI(Resource):
         content = ""
         try:
             with ui.open() as f:
-                content = f.readlines()
+                content = f.read()
         except IOError:
             pass
         head = re.search(r"<head>(.*)</head>", content, re.DOTALL)
