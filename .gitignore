@@ -1,3 +1,6 @@
+# Project specific
+awerem.cfg
+
 *.py[cod]
 
 # C extensions
@@ -38,4 +41,4 @@ nosetests.xml
 .ropeproject
 
 # Vim
-*.swp
+*.sw[po]
