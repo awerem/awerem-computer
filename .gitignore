@@ -1,6 +1,7 @@
 # Project specific
 awerem.cfg
 
+# Python
 *.py[cod]
 
 # C extensions
