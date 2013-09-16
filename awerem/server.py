@@ -1,9 +1,5 @@
 #!/bin/env python
 
-import json
-import uuid
-import socket
-
 from twisted.web import xmlrpc, server
 from twisted.web.resource import Resource
 from twisted.web.static import File
@@ -18,6 +14,7 @@ from uimanager import UIManager
 from coremanager import CoreManager
 from pollmanager import PollManager, PollManagerBind
 from processesmanager import ProcessesManagerSingleton
+import confloader
 
 import logging
 logging.basicConfig()
@@ -39,38 +36,6 @@ def init_pm(pollmanager):
     return pm
 
 
-def generate_conf_file():
-    try:
-        with open("awerem.cfg", "w") as conf_file:
-            conf = {"uuid": uuid.uuid4().hex, "name": socket.gethostname()}
-            json.dump(conf, conf_file, indent=4, sort_keys=True)
-    except IOError:
-        print("Impossible to create awerem.cfg, exiting now")
-        exit()
-
-
-def get_uuid():
-    try:
-        with open("awerem.cfg") as conf_file:
-            conf = json.load(conf_file)
-    except IOError:
-        generate_conf_file()
-        return get_uuid()
-    else:
-        return conf["uuid"]
-
-
-def get_server_name():
-    try:
-        with open("awerem.cfg") as conf_file:
-            conf = json.load(conf_file)
-    except IOError:
-        generate_conf_file()
-        return get_server_name()
-    else:
-        return conf["name"][:20]
-
-
 class UDPDiscover(DatagramProtocol):
     """
     Respond when a client tries to discover the server in the local network
@@ -85,8 +50,9 @@ class UDPDiscover(DatagramProtocol):
     def datagramReceived(self, data, (host, port)):
         lines = data.split("\n")
         if lines[0] == "awerem" and lines[1] == "ping":
-            answer = ("awerem\npong\n" + lines[2] + "\n" + get_uuid() + "\n"
-                      + get_server_name())
+            answer = ("awerem\npong\n" + lines[2] + "\n"
+                      + confloader.get_uuid() + "\n"
+                      + confloader.get_server_name())
             self.transport.write(answer,
                                  (host, port))
 
