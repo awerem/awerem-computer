@@ -68,7 +68,7 @@ def get_server_name():
         generate_conf_file()
         return get_server_name()
     else:
-        return conf["name"]
+        return conf["name"][:20]
 
 
 class UDPDiscover(DatagramProtocol):
