@@ -1,5 +1,9 @@
 #!/bin/env python
 
+import json
+import uuid
+import socket
+
 from twisted.web import xmlrpc, server
 from twisted.web.resource import Resource
 from twisted.web.static import File
@@ -35,15 +39,55 @@ def init_pm(pollmanager):
     return pm
 
 
+def generate_conf_file():
+    try:
+        with open("awerem.cfg", "w") as conf_file:
+            conf = {"uuid": uuid.uuid4().hex, "name": socket.gethostname()}
+            json.dump(conf, conf_file, indent=4, sort_keys=True)
+    except IOError:
+        print("Impossible to create awerem.cfg, exiting now")
+        exit()
+
+
+def get_uuid():
+    try:
+        with open("awerem.cfg") as conf_file:
+            conf = json.load(conf_file)
+    except IOError:
+        generate_conf_file()
+        return get_uuid()
+    else:
+        return conf["uuid"]
+
+
+def get_server_name():
+    try:
+        with open("awerem.cfg") as conf_file:
+            conf = json.load(conf_file)
+    except IOError:
+        generate_conf_file()
+        return get_server_name()
+    else:
+        return conf["name"]
+
+
 class UDPDiscover(DatagramProtocol):
     """
     Respond when a client tries to discover the server in the local network
+    The answer looks like this:
+        awerem
+        pong
+        [TOKEN]
+        [UUID of the awerem server]
+        [Name of the server]
     """
 
     def datagramReceived(self, data, (host, port)):
         lines = data.split("\n")
         if lines[0] == "awerem" and lines[1] == "ping":
-            self.transport.write("awerem\npong\n" + lines[2] + "\n",
+            answer = ("awerem\npong\n" + lines[2] + "\n" + get_uuid() + "\n"
+                      + get_server_name())
+            self.transport.write(answer,
                                  (host, port))
 
 
