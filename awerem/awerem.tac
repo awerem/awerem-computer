@@ -5,17 +5,17 @@ from twisted.web import xmlrpc, server
 from twisted.web.resource import Resource
 from twisted.web.static import File
 
-from twisted.internet.protocol import DatagramProtocol
 
 from yapsy.PluginManager import PluginManagerSingleton
 from yapsy.PluginFileLocator import (PluginFileLocator,
                                      PluginFileAnalyzerWithInfoFile)
+
+from udpdiscover import UDPDiscover
 from modules.aweremplugin import AweRemPlugin
 from uimanager import UIManager
 from coremanager import CoreManager
 from pollmanager import PollManager, PollManagerBind
 from processesmanager import ProcessesManagerSingleton
-import confloader
 
 import logging
 logging.basicConfig()
@@ -37,27 +37,6 @@ def init_pm(pollmanager):
     return pm
 
 
-class UDPDiscover(DatagramProtocol):
-    """
-    Respond when a client tries to discover the server in the local network
-    The answer looks like this:
-        awerem
-        pong
-        [TOKEN]
-        [UUID of the awerem server]
-        [Name of the server]
-    """
-
-    def datagramReceived(self, data, (host, port)):
-        lines = data.split("\n")
-        if lines[0] == "awerem" and lines[1] == "ping":
-            answer = ("awerem\npong\n" + lines[2] + "\n"
-                      + confloader.get_uuid() + "\n"
-                      + confloader.get_server_name())
-            self.transport.write(answer,
-                                 (host, port))
-
-
 class ActionsManager(xmlrpc.XMLRPC):
     """
     Resource that executes all the actions provided by the plugins
@@ -69,10 +48,6 @@ class ActionsManager(xmlrpc.XMLRPC):
             self.putSubHandler(plugin.name, plugin.plugin_object.getHandler())
 
 
-class ConfigureManager(xmlrpc.XMLRPC):
-    pass
-
-
 def get_web_service():
     pollmanager = PollManager()
     procmanager = ProcessesManagerSingleton.get()
@@ -82,7 +57,6 @@ def get_web_service():
     r.putChild("core", CoreManager(pollmanager))
     r.putChild("action", ActionsManager())
     r.putChild("ui", UIManager())
-    r.putChild("configure", ConfigureManager())
     r.putChild("resources", File("resources"))
     return internet.TCPServer(34340, server.Site(r))
 
