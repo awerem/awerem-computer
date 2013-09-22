@@ -1,5 +1,6 @@
 #!/bin/env python
 
+from twisted.application import internet, service
 from twisted.web import xmlrpc, server
 from twisted.web.resource import Resource
 from twisted.web.static import File
@@ -71,8 +72,8 @@ class ActionsManager(xmlrpc.XMLRPC):
 class ConfigureManager(xmlrpc.XMLRPC):
     pass
 
-if __name__ == '__main__':
-    from twisted.internet import reactor
+
+def get_web_service():
     pollmanager = PollManager()
     procmanager = ProcessesManagerSingleton.get()
     procmanager.start()
@@ -83,6 +84,15 @@ if __name__ == '__main__':
     r.putChild("ui", UIManager())
     r.putChild("configure", ConfigureManager())
     r.putChild("resources", File("resources"))
-    reactor.listenTCP(34340, server.Site(r))
-    reactor.listenUDP(34340, UDPDiscover())
-    reactor.run()
+    return internet.TCPServer(34340, server.Site(r))
+
+
+def get_udp_discover():
+    return internet.UDPServer(34340, UDPDiscover())
+
+application = service.Application("AweRem Server")
+webserv = get_web_service()
+webserv.setServiceParent(application)
+
+discoverserv = get_udp_discover()
+discoverserv.setServiceParent(application)
