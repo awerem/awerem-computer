@@ -1,5 +1,6 @@
 # Project specific
 awerem.cfg
+twistd.log
 
 # Python
 *.py[cod]
