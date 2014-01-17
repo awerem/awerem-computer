@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.light.css" id="jQMnDTheme"/>
+        <link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.color.red.css" id="jQMnDColor"/>
+    </head>
+    <body>
+        <div data-role="page" data-theme="b">
+            <div data-role="content">
+                <form>
+                <ul data-role="listview" data-inset="true">
+                    <li>
+                        <fieldset>
+                        <button type="button" id="redbutton" data-icon="off">Redbutton</button>
+                        <button type="button" id="custombutton" data-icon="linux">Custombutton</button>
+                        </fieldset>
+                    </li>
+                    <li id="info">Nothing here</li>
+                </ul>
+                </form>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $('#redbutton').tap(function(e){
+                awerem.sendActionAsync("press", function(result) {$("#info").text(result);})
+            });
+            $('#custombutton').tap(function(e){
+                awerem.sendActionAsync("custompress", "Custom")});
+        </script>
+    </body>
+</html>

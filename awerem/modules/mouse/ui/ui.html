@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.light.css" id="jQMnDTheme"/>
+        <link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.color.blue.css" id="jQMnDColor"/>
+        <style type="text/css">
+            html, body, .whole
+            {
+                width: 100%;
+                height: 100%;
+            }
+            #trackzone
+            {
+                width: 100%;
+                height: 100%;
+                background: #ddd;
+            }
+            .bottom
+            {
+                position: absolute;
+                bottom: 0%;
+                height: 20%;
+                width: 100%;
+            }
+            .bottom *
+            {
+                height: 100%;
+            }
+            .bottom a
+            {
+                border: 1px solid #6dcaec;
+            }
+        </style>
+    </head>
+    <body>
+        <div data-role="page" data-theme="b" class="whole">
+            <div data-role="content" class="whole">
+                <div id="trackzone"></div>
+                <div class="container_12 bottom">
+                    <div class="grid_6">
+                        <a data-role="button" id="left" class="whole" href="#"></a>
+                    </div>
+                    <div class="grid_6">
+                        <a data-role="button" id="right" class="whole" href="#"></a>
+                    </div>
+               </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $(document).bind("pageinit", function(e){
+                before = {};
+                lastCheck = 0;
+                $('#trackzone').tap(function(e){
+                        $('#trackzone').text("tapped");
+                        awerem.sendActionAsync("click", 1);
+                        });
+                $('#trackzone').on("touchstart", function(e) {
+                        before = e.originalEvent.targetTouches[0];
+                        lastCheck = new Date().getTime()
+                        });
+                $('#trackzone').on("touchmove", function(e) {
+                    if (new Date().getTime() - lastCheck > 30)
+                    {
+                        lastCheck = new Date().getTime();
+                        x = e.originalEvent.targetTouches[0].pageX - before.pageX;
+                        y = e.originalEvent.targetTouches[0].pageY - before.pageY;
+                        before = e.originalEvent.targetTouches[0];
+                        $('#trackzone').text("X: " + x + ", Y: " + y);
+                        awerem.sendActionAsync("move", x, y);
+                    }
+                    });
+                $("#left").on("touchstart", function(e) {
+                        $("#left").addClass("ui-btn-down-b")
+                        awerem.sendActionAsync("press", 1);
+                        });
+                $("#left").on("touchend", function(e) {
+                        $("#left").removeClass("ui-btn-down-b")
+                        awerem.sendActionAsync("release", 1);
+                        });
+                $("#right").on("touchstart", function(e) {
+                        $("#right").addClass("ui-btn-down-b")
+                        awerem.sendActionAsync("press", 2);
+                        });
+                $("#right").on("touchend", function(e) {
+                        $("#right").removeClass("ui-btn-down-b")
+                        awerem.sendActionAsync("release", 2);
+                        });
+                });
+        </script>
+    </body>
+</html>

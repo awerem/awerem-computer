@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.light.css" id="jQMnDTheme"/>
+        <link rel="stylesheet" type="text/css" href="/resources/css/jquerymobile.nativedroid.color.red.css" id="jQMnDColor"/>
+    </head>
+    <body>
+        <div data-role="page" data-theme="b">
+            <div data-role="content">
+                <form>
+                <ul data-role="listview" data-inset="true">
+                    <li>
+                        <fieldset>
+                        <button type="button" id="next" data-icon="off">next</button>
+                        <button type="button" id="like" data-icon="off">like</button>
+                        <button type="button" id="dislike" data-icon="linux">Dislike</button>
+                        </fieldset>
+                    </li>
+                </ul>
+                </form>
+            </div>
+        </div>
+        <script type="text/javascript">
+            $('#next').tap(function(){
+                awerem.sendActionAsync("message", "next");
+            });
+            $('#like').tap(function(){
+                awerem.sendActionAsync("message", "like");
+            });
+            $('#dislike').tap(function(){
+                awerem.sendActionAsync("message", "dislike")});
+        </script>
+    </body>
+</html>
